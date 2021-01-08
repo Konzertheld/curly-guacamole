@@ -23,3 +23,7 @@ CREATE TABLE "tasks_tags" (
 	"task_id"	INTEGER NOT NULL,
 	"tag_name"	TEXT NOT NULL
 );
+
+INSERT INTO tags (name) VALUES ("overdue");
+INSERT INTO tags (name) VALUES ("additional");
+INSERT INTO tags (name) VALUES ("orphaned");
