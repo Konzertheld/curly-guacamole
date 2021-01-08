@@ -3,3 +3,11 @@ Functions needed:
 - Find next day with X free space
 - Find next day with X percent free space
 - Figure out how much space can be freed by moving a task#4
+
+How to fill days
+- X hours per day for tasks, prohibit adding more
+- do not auto-fill up to X
+- subtract 20/30min or so for each task
+
+- A day has 24 hours. 10 for sleep. 2 for cooking. 2 more for other meals, pooping etc. = 10h
+- take lectures and appointments into account - done by google calendar import
