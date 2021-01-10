@@ -12,11 +12,13 @@ function post($url, $params) {
     );
     $context  = stream_context_create($options);
     $result = file_get_contents($url, false, $context);
-    if ($result === FALSE) { print "could not get " . $url; }
+    if ($result === FALSE) {
+        print "could not get " . $url;
+    }
     return $result;
 }
 
-function get_json($url, $params) {
+function get_json_google($url, $params) {
     $authdata = json_decode(file_get_contents('data/google_token.json'));
     $options = array(
         'http' => array(
@@ -25,8 +27,16 @@ function get_json($url, $params) {
         )
     );
     $context  = stream_context_create($options);
-    $result = file_get_contents($url . '?' . http_build_query($params),false, $context);
-    return json_decode($result);
+    $result = @file_get_contents($url . '?' . http_build_query($params),false, $context);
+    if(strpos($http_response_header[0], "200")) {
+        return json_decode($result);
+    }
+    elseif(strpos($http_response_header[0], "401")) {
+        // TODO handle failed login, likely there was a problem with the token before
+    }
+    else {
+        // TODO handle other errors
+    }
 }
 
 //function rtm_post($url, $params) {
@@ -35,3 +45,7 @@ function get_json($url, $params) {
 //    return post($url, $params);
 //}
 
+function calculate_duration(DateTime $d1, DateTime $d2) {
+    $diff = $d1->diff($d2);
+    return $diff->d * 3600 * 24 + $diff->h * 3600 + $diff->i * 60 + $diff->s;
+}

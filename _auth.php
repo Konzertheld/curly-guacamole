@@ -26,7 +26,7 @@ function google_exchange() {
     print_r($params);
     $result_original = post($url, $params);
     $result = json_decode($result_original);
-    $result->expires_at = time() + $result->expires_in * 60;
+    $result->expires_at = time() + $result->expires_in;
     $google_token = $result->access_token;
     if(!$google_token) die("no token, fuck");
     file_put_contents('data/google_token.json', json_encode($result));
@@ -34,21 +34,28 @@ function google_exchange() {
 
 function google_check_and_refresh() {
     if(file_exists('data/google_token.json')) {
-        $json = json_decode(file_get_contents('data/google_token.json'));
-        if (time() >= $json->expires_at) {
-            $url = 'https://oauth2.googleapis.com/token';
-            $params['client_id'] = $json->client_id;
-            $params['client_secret'] = $json->client_secret;
-            $params['refresh_token'] = $json->refresh_token;
-            $params['grant_type'] = 'refresh_token';
-            $result_original = post($url, $params);
-            $result = json_decode($result_original);
-            $json->access_token = $result->access_token;
-            $json->expires_at = time() + $result->expires_in;
-            file_put_contents('data/google_token.json', json_encode($json));
+        $credentials = json_decode(file_get_contents('data/client_secret.json'));
+        $token = json_decode(file_get_contents('data/google_token.json'));
+        if (time() >= $token->expires_at) {
+            if(isset($token->refresh_token)) {
+                $url = 'https://oauth2.googleapis.com/token';
+                $params['client_id'] = $credentials->web->client_id;
+                $params['client_secret'] = $credentials->web->client_secret;
+                $params['refresh_token'] = $token->refresh_token;
+                $params['grant_type'] = 'refresh_token';
+                $result_original = post($url, $params);
+                $result = json_decode($result_original);
+                $token->access_token = $result->access_token;
+                $token->expires_at = time() + $result->expires_in;
+                file_put_contents('data/google_token.json', json_encode($token));
+                return;
+            }
+            // else jump to header() below
+        }
+        else {
+            // token found and not expired
+            return;
         }
     }
-    else {
-        header('Location: ' . google_auth_url());
-    }
+    header('Location: ' . google_auth_url());
 }
