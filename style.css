@@ -1,0 +1,76 @@
+@font-face {
+    font-family: 'gandhi';
+    src: url('vendor/GandhiSans-Regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'gandhi';
+    src: url('vendor/GandhiSans-Italic-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+}
+@font-face {
+    font-family: 'gandhi';
+    src: url('vendor/GandhiSans-Bold-webfont.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'gandhi';
+    src: url('vendor/GandhiSans-BoldItalic-webfont.woff') format('woff');
+    font-weight: bold;
+    font-style: italic;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	background: #393939;
+	font-family: gandhi;
+}
+#days-container {
+	display: flex;
+	flex-direction: row;
+	max-width: 100%;
+	flex-wrap: wrap;
+}
+.day-heading {
+	margin: 0;
+	padding: 3px;
+	text-align: center;
+	font-weight: normal;
+}
+#day-1 .day-heading, #day-3 .day-heading, #day-6 .day-heading, #day-8 .day-heading {
+	background: #555;
+}
+#day-2 .day-heading, #day-4 .day-heading, #day-5 .day-heading, #day-7 .day-heading {
+	background: #143a5e;
+}
+.day {
+	width: 25%;
+	box-sizing: border-box;
+	color: #fafafa;
+	background-size: 20px auto;
+}
+.day ul {
+	padding: 10px;
+	margin: 0;
+}
+.day ul li {
+	list-style-type: none;
+	margin: 0 0 10px 0;
+}
+li.task + li.task.done {
+	margin-top: 20px;
+	border-top: 1px solid #66d9ef;
+	padding-top: 20px;
+}
+.day ul li h2 {
+	margin: 0 0 3px 0;
+	font-weight: normal;
+	color: #A6E22E;
+}
+.day ul li.done h2 {
+	color: #66d9ef;
+}

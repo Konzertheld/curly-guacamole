@@ -52,6 +52,8 @@ function calculate_duration(DateTime $d1, DateTime $d2) {
 
 function write_items_to_database($conn, $items) {
 	// Write events to database
+	$ioi = $conn->prepare('INSERT OR IGNORE INTO tasks (description, duration, date, google_id) VALUES (:description, :duration, :date, :google_id)');
+	$upd = $conn->prepare('UPDATE tasks SET description=:description, duration=:duration, date=:date WHERE google_id=:google_id');
 	$conn->beginTransaction();
 	foreach($items as $item) {
 		$start = google_create_date($item->start);
@@ -70,4 +72,21 @@ function write_items_to_database($conn, $items) {
 		$upd->execute();
 	}
 	return $conn->commit();
+}
+
+function read_items_from_database($conn, $from = null) {
+	if(empty($from)) {
+		$from = date('Y-m-d');
+	}
+	$read = $conn->prepare('SELECT description, duration, date, advance_span, deadline_day, deadline_time, done FROM tasks WHERE date >= :today AND date < :date ORDER BY date ASC, done ASC');
+	$read->bindValue(':today', date_create($from)->format('Y-m-d'));
+	$read->bindValue(':date', date_add(date_create($from), new DateInterval('P8D'))->format('Y-m-d'));
+	$read->execute();
+	for($i = 0; $i < 8; $i++) {
+		$days[date_add(date_create($from), new DateInterval('P' . $i . 'D'))->format('Y-m-d')] = [];
+	}
+	while($row = $read->fetch(PDO::FETCH_OBJ)) {
+		$days[$row->date][] = $row;
+	}
+	return $days;
 }

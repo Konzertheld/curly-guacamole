@@ -17,8 +17,6 @@ $config = json_decode(file_get_contents('data/config.json'));
 
 // Open database
 $conn = new PDO('sqlite:' . __DIR__ . '/data/data.db');
-$ioi = $conn->prepare('INSERT OR IGNORE INTO tasks (description, duration, date, google_id) VALUES (:description, :duration, :date, :google_id)');
-$upd = $conn->prepare('UPDATE tasks SET description=:description, duration=:duration, date=:date WHERE google_id=:google_id');
 
 // Update database from Google
 // @TODO Check if we need to get Google data
@@ -26,6 +24,7 @@ $google_items = google_get_next_events($config);
 write_items_to_database($conn, $google_items);
 
 // Get items for the next 8 days
-// TODO beginning from X
+$days = read_items_from_database($conn, $_GET['from']); // TODO make this safe
 
-print "200";
+// Display main page
+include('start.php');
