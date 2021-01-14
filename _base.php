@@ -33,9 +33,11 @@ function get_json_google($url, $params) {
 	}
 	elseif(strpos($http_response_header[0], "401")) {
 		// TODO handle failed login, likely there was a problem with the token before
+		return false;
 	}
 	else {
 		// TODO handle other errors
+		return false;
 	}
 }
 
@@ -47,10 +49,15 @@ function get_json_google($url, $params) {
 
 function calculate_duration(DateTime $d1, DateTime $d2) {
 	$diff = $d1->diff($d2);
+	if($diff->d == 1 && $diff->h == 0 && $diff->i == 0 && $diff->s == 0) {
+		// Google all-day event, return default duration
+		// TODO load default duration from config
+		return 90 * 60;
+	}
 	return $diff->d * 3600 * 24 + $diff->h * 3600 + $diff->i * 60 + $diff->s;
 }
 
-function write_items_to_database($conn, $items) {
+function write_items_to_database(PDO $conn, $items) {
 	// Write events to database
 	$ioi = $conn->prepare('INSERT OR IGNORE INTO tasks (description, duration, date, google_id) VALUES (:description, :duration, :date, :google_id)');
 	$upd = $conn->prepare('UPDATE tasks SET description=:description, duration=:duration, date=:date WHERE google_id=:google_id');
@@ -58,7 +65,6 @@ function write_items_to_database($conn, $items) {
 	foreach($items as $item) {
 		$start = google_create_date($item->start);
 		$end = google_create_date($item->end);
-		// TODO handle all-day events, setting their duration to the default duration
 		$duration = calculate_duration($start, $end);
 		$ioi->bindValue(':description', $item->summary);
 		$upd->bindValue(':description', $item->summary);
@@ -74,7 +80,7 @@ function write_items_to_database($conn, $items) {
 	return $conn->commit();
 }
 
-function read_items_from_database($conn, $from = null) {
+function read_items_from_database(PDO $conn, $from = null) {
 	if(empty($from)) {
 		$from = date('Y-m-d');
 	}
@@ -89,4 +95,41 @@ function read_items_from_database($conn, $from = null) {
 		$days[$row->date][] = $row;
 	}
 	return $days;
+}
+
+function get_next_day_with_free_space(PDO $conn, $space_needed, $deadline_only = false) {
+	// TODO: Get additional time per task (20 min = 1200 seconds) from config
+	// Get future days with their used time from the database
+	if($deadline_only) {
+		$stmt = $conn->prepare('SELECT date, SUM(duration) + COUNT(id) * 1200 usedtime FROM tasks WHERE date > :date AND deadline_day IS NOT NULL GROUP BY date');
+	}
+	else {
+		$stmt = $conn->prepare('SELECT date, SUM(duration) + COUNT(id) * 1200 usedtime FROM tasks WHERE date > :date GROUP BY date');
+	}
+	$stmt->bindValue(':date', date('Y-m-d'));
+	$stmt->execute();
+	$days = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	// Unpack result into arrays for the days and their usedtime
+	$days_merged = array_merge_recursive(...$days);
+	// Go through next days and figure out which is the first one that is either
+	// - not present in the result (empty)
+	// - or not full (has less than X time used)
+	// TODO: Load maximum lookahead (30 days) from config- it determines how far a task is moved max
+	for($i = 1; $i <= 30; $i++) {
+		$date = date_add(date_create(), new DateInterval(('P' . $i .'D')))->format('Y-m-d');
+		$position = array_search($date, $days_merged['date']);
+		if($position === false || $days_merged['usedtime'][$position] + $space_needed < 9 * 3600) {
+			// TODO: Load maximum day load (9h) from config
+			return $date;
+		}
+	}
+
+	return false;
+}
+
+function move_task(PDO $conn, $id, $date) {
+	$upd = $conn->prepare('UPDATE tasks SET date=:date WHERE id=:id');
+	$upd->bindValue(':date', $date);
+	$upd->bindValue(':id', $id);
+	return $upd->execute();
 }
