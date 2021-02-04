@@ -12,7 +12,8 @@
 		<h1 class="day-heading"><?php echo $day; ?></h1>
 		<ul><?php foreach($tasks as $task): ?>
 			<li class="task<?php if($task->done) echo ' done'; ?>"><h2 class="task-heading"><?php echo $task->description; ?></h2>
-				<span class="deadline">Deadline usw</span>
+				<span class="deadline"><?php echo $task->deadline_day; ?></span>
+				<span class="duration"><?php echo $task->duration / 60; ?> min</span>
 			</li>
 			<?php endforeach; ?>
 		</ul>

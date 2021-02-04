@@ -59,8 +59,9 @@ function calculate_duration(DateTime $d1, DateTime $d2) {
 
 function write_items_to_database(PDO $conn, $items) {
 	// Write events to database
-	$ioi = $conn->prepare('INSERT OR IGNORE INTO tasks (description, duration, date, google_id) VALUES (:description, :duration, :date, :google_id)');
-	$upd = $conn->prepare('UPDATE tasks SET description=:description, duration=:duration, date=:date WHERE google_id=:google_id');
+	// TODO this is so google specific it should not be here
+	$ioi = $conn->prepare('INSERT OR IGNORE INTO tasks (description, duration, date, google_id, deadline_day) VALUES (:description, :duration, :date, :google_id, :deadline_day)');
+	$upd = $conn->prepare('UPDATE tasks SET description=:description, duration=:duration, date=:date, deadline_day=:deadline_day WHERE google_id=:google_id');
 	$conn->beginTransaction();
 	foreach($items as $item) {
 		$start = google_create_date($item->start);
@@ -70,6 +71,14 @@ function write_items_to_database(PDO $conn, $items) {
 		$upd->bindValue(':description', $item->summary);
 		$ioi->bindValue(':google_id', $item->id);
 		$upd->bindValue(':google_id', $item->id);
+		if(google_is_appointment($item)) {
+			$ioi->bindValue(':deadline_day', $end->format('Y-m-d'));
+			$upd->bindValue(':deadline_day', $end->format('Y-m-d'));
+		}
+		else {
+			$ioi->bindValue(':deadline_day', null);
+			$upd->bindValue(':deadline_day', null);
+		}
 		$ioi->bindValue(':duration', $duration, PDO::PARAM_INT);
 		$upd->bindValue(':duration', $duration, PDO::PARAM_INT);
 		$ioi->bindValue(':date', $start->format('Y-m-d'));
@@ -115,7 +124,7 @@ function get_next_day_with_free_space(PDO $conn, $space_needed, $deadline_only =
 	// - not present in the result (empty)
 	// - or not full (has less than X time used)
 	// TODO: Load maximum lookahead (30 days) from config- it determines how far a task is moved max
-	for($i = 1; $i <= 30; $i++) {
+	for($i = 0; $i < 30; $i++) {
 		$date = date_add(date_create(), new DateInterval(('P' . $i .'D')))->format('Y-m-d');
 		$position = array_search($date, $days_merged['date']);
 		if($position === false || $days_merged['usedtime'][$position] + $space_needed < 9 * 3600) {
@@ -132,4 +141,12 @@ function move_task(PDO $conn, $id, $date) {
 	$upd->bindValue(':date', $date);
 	$upd->bindValue(':id', $id);
 	return $upd->execute();
+}
+
+function tag_task(PDO $conn, $id, $tag) {
+	// TODO BUG this inserts rows again, ignore does not work
+	$ioi = $conn->prepare('INSERT OR IGNORE INTO tasks_tags (task_id, tag_name) VALUES (:id, :tag)');
+	$ioi->bindValue(':id', $id);
+	$ioi->bindValue(':tag', $tag);
+	return $ioi->execute();
 }
