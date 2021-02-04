@@ -11,3 +11,5 @@ How to fill days
 
 - A day has 24 hours. 10 for sleep. 2 for cooking. 2 more for other meals, pooping etc. = 10h
 - take lectures and appointments into account - done by google calendar import
+
+Auto-read sent mails
