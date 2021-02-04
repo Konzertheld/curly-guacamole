@@ -27,3 +27,4 @@ CREATE TABLE "tasks_tags" (
 INSERT INTO tags (name) VALUES ("overdue");
 INSERT INTO tags (name) VALUES ("additional");
 INSERT INTO tags (name) VALUES ("orphaned");
+INSERT INTO tags (name) VALUES ("expired");
