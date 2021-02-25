@@ -108,12 +108,13 @@ function read_items_from_database(PDO $conn, $from = null) {
 
 function get_next_day_with_free_space(PDO $conn, $space_needed, $deadline_only = false) {
 	// TODO: Get additional time per task (20 min = 1200 seconds) from config
-	// Get future days with their used time from the database
+	// Get future days including today with their used time from the database
+	// Why include today? There might still be time left
 	if($deadline_only) {
-		$stmt = $conn->prepare('SELECT date, SUM(duration) + COUNT(id) * 1200 usedtime FROM tasks WHERE date > :date AND deadline_day IS NOT NULL GROUP BY date');
+		$stmt = $conn->prepare('SELECT date, SUM(duration) + COUNT(id) * 1200 usedtime FROM tasks WHERE date >= :date AND deadline_day IS NOT NULL GROUP BY date');
 	}
 	else {
-		$stmt = $conn->prepare('SELECT date, SUM(duration) + COUNT(id) * 1200 usedtime FROM tasks WHERE date > :date GROUP BY date');
+		$stmt = $conn->prepare('SELECT date, SUM(duration) + COUNT(id) * 1200 usedtime FROM tasks WHERE date >= :date GROUP BY date');
 	}
 	$stmt->bindValue(':date', date('Y-m-d'));
 	$stmt->execute();
@@ -124,6 +125,8 @@ function get_next_day_with_free_space(PDO $conn, $space_needed, $deadline_only =
 	// - not present in the result (empty)
 	// - or not full (has less than X time used)
 	// TODO: Load maximum lookahead (30 days) from config- it determines how far a task is moved max
+	// Start with +0 from today as today might have enough space. It was important to include today in the query above, otherwise today would not appear in the list,
+	// being interpreted as completely free every time
 	for($i = 0; $i < 30; $i++) {
 		$date = date_add(date_create(), new DateInterval(('P' . $i .'D')))->format('Y-m-d');
 		$position = array_search($date, $days_merged['date']);
