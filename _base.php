@@ -93,7 +93,7 @@ function read_items_from_database(PDO $conn, $from = null) {
 	if(empty($from)) {
 		$from = date('Y-m-d');
 	}
-	$read = $conn->prepare('SELECT description, duration, date, advance_span, deadline_day, deadline_time, done FROM tasks WHERE date >= :today AND date < :date ORDER BY date ASC, done ASC');
+	$read = $conn->prepare('SELECT id, description, duration, date, advance_span, deadline_day, deadline_time, done FROM tasks WHERE date >= :today AND date < :date ORDER BY date ASC, done ASC');
 	$read->bindValue(':today', date_create($from)->format('Y-m-d'));
 	$read->bindValue(':date', date_add(date_create($from), new DateInterval('P8D'))->format('Y-m-d'));
 	$read->execute();

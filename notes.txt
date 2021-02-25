@@ -13,3 +13,6 @@ How to fill days
 - take lectures and appointments into account - done by google calendar import
 
 Auto-read sent mails
+
+Hacks:
+- Grab old Google "event" tasks that have not been managed via the Planer: Manually change Google last update date, reload, events will be spread over the next days, mark as done, *rewind date again* and update, those events will get updated with the Google date again, overwriting the newly assigned dates, and they will not get assigned a new date again as they are now done. This overwriting behaviour will most likely become annoying somewhen

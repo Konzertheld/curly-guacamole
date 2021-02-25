@@ -61,7 +61,7 @@ body {
 	list-style-type: none;
 	margin: 0 0 10px 0;
 }
-li.task + li.task.done {
+li.task.undone + li.task.done {
 	margin-top: 20px;
 	border-top: 1px solid #66d9ef;
 	padding-top: 20px;
@@ -73,4 +73,10 @@ li.task + li.task.done {
 }
 .day ul li.done h2 {
 	color: #66d9ef;
+}
+li.task.selected, li.task.selected h2 {
+	color: #dd7733;
+}
+li.task.selected.done, li.task.selected.done h2 {
+	color: #dd7777;
 }
