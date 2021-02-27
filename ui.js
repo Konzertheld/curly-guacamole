@@ -13,9 +13,10 @@ window.onload = function () {
         });
 
         switch (e.which) {
+            // Note that the order might be important
             case 68:
                 // D for done and move to today
-                commands = ["done", "today"];
+                commands = ["today", "done"];
                 break;
             case 100:
                 // d for done
