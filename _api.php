@@ -6,7 +6,7 @@ require_once("_base.php");
 $conn = new PDO('sqlite:' . __DIR__ . '/data/data.db');
 $task_ids = explode(",", $_GET["task_ids"]);
 
-foreach(explode(",", $_GET["commands"]) as $command) {
+foreach (explode(",", $_GET["commands"]) as $command) {
 	switch ($command) {
 		case "done":
 			echo done_task($conn, $task_ids);

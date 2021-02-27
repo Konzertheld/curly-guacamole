@@ -1,5 +1,6 @@
 <?php
-function google_auth_url() {
+function google_auth_url()
+{
 	$json = json_decode(file_get_contents('data/client_secret.json'));
 	$url = 'https://accounts.google.com/o/oauth2/v2/auth?';
 	$params['redirect_uri'] = 'http://' . $_SERVER['HTTP_HOST'] . '/planer/'; // has to match with the below function
@@ -15,7 +16,8 @@ function google_auth_url() {
 	return $url;
 }
 
-function google_exchange() {
+function google_exchange()
+{
 	$auth_json = json_decode(file_get_contents('data/client_secret.json'));
 	$url = 'https://oauth2.googleapis.com/token';
 	$params['client_id'] = $auth_json->web->client_id;
@@ -28,16 +30,17 @@ function google_exchange() {
 	$result = json_decode($result_original);
 	$result->expires_at = time() + $result->expires_in;
 	$google_token = $result->access_token;
-	if(!$google_token) die("no token, fuck");
+	if (!$google_token) die("no token, fuck");
 	file_put_contents('data/google_token.json', json_encode($result));
 }
 
-function google_check_and_refresh() {
-	if(file_exists('data/google_token.json')) {
+function google_check_and_refresh()
+{
+	if (file_exists('data/google_token.json')) {
 		$credentials = json_decode(file_get_contents('data/client_secret.json'));
 		$token = json_decode(file_get_contents('data/google_token.json'));
 		if (time() >= $token->expires_at) {
-			if(isset($token->refresh_token)) {
+			if (isset($token->refresh_token)) {
 				$url = 'https://oauth2.googleapis.com/token';
 				$params['client_id'] = $credentials->web->client_id;
 				$params['client_secret'] = $credentials->web->client_secret;
@@ -51,8 +54,7 @@ function google_check_and_refresh() {
 				return;
 			}
 			// else jump to header() below
-		}
-		else {
+		} else {
 			// token found and not expired
 			return;
 		}

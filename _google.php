@@ -1,24 +1,25 @@
 <?php
-function google_create_date($dateobj) {
+function google_create_date($dateobj)
+{
 	// TODO: Use nullable operator
-	if(property_exists($dateobj, "dateTime")) {
+	if (property_exists($dateobj, "dateTime")) {
 		return date_create($dateobj->dateTime);
-	}
-	else return date_create($dateobj->date);
+	} else return date_create($dateobj->date);
 }
 
-function google_is_appointment($item) {
+function google_is_appointment($item)
+{
 	// TODO: and if in specific calendar
 	return property_exists($item->start, "dateTime") && property_exists($item->end, "dateTime");
 }
 
-function google_get_next_events($config) {
+function google_get_next_events($config)
+{
 	// Get next Google events from now
 	$now = date(DATE_RFC3339);
-	if(property_exists($config, 'last_google_check')) {
+	if (property_exists($config, 'last_google_check')) {
 		$from = $config->last_google_check;
-	}
-	else {
+	} else {
 		$from = $now;
 	}
 	// @TODO limit to 4 weeks

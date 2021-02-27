@@ -41,7 +41,7 @@ window.onload = function () {
                 $(".selected").removeClass("selected");
                 break;
         }
-        if(typeof commands !== "undefined") {
+        if (typeof commands !== "undefined") {
             $.ajax({
                 url: "/planer/_api.php",
                 data: {
