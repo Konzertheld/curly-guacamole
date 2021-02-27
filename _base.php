@@ -140,10 +140,27 @@ function get_next_day_with_free_space(PDO $conn, $space_needed, $deadline_only =
 }
 
 function move_task(PDO $conn, $id, $date) {
+	if(!is_array($id)) $id = [$id];
 	$upd = $conn->prepare('UPDATE tasks SET date=:date WHERE id=:id');
-	$upd->bindValue(':date', $date);
-	$upd->bindValue(':id', $id);
-	return $upd->execute();
+	$conn->beginTransaction();
+	foreach($id as $task_id) {
+		$upd->bindValue(':date', $date);
+		$upd->bindValue(':id', $task_id);
+		$upd->execute();
+	}
+	return $conn->commit();
+}
+
+function done_task(PDO $conn, $task_ids)
+{
+	if (!is_array($task_ids)) $id = [$task_ids];
+	$done = $conn->prepare('UPDATE tasks SET done=((done | 1) - (done & 1)) WHERE id = :id');
+	$conn->beginTransaction();
+	foreach ($task_ids as $task_id) {
+		$done->bindValue(':id', $task_id);
+		$done->execute();
+	}
+	return $conn->commit();
 }
 
 function tag_task(PDO $conn, $id, $tag) {
