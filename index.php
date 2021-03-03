@@ -37,6 +37,7 @@ while($row = $pastsql->fetch(PDO::FETCH_OBJ)) {
 			tag_task($conn, $row->id, 'overdue');
 		}
 		elseif($row->deadline < $today) {
+			// TODO: This will be called every time until the task is handled; that's not too bad but it's also not nice
 			tag_task($conn, $row->id, 'expired');
 		}
 		elseif($row->deadline_day >= $day) {
