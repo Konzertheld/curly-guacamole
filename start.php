@@ -21,7 +21,8 @@
 				<?php endforeach; ?>
 			</ul>
 		</section>
-		<?php $i++; endforeach; ?>
+		<?php $i++;
+	endforeach; ?>
 </div>
 </body>
 </html>
