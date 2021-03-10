@@ -1,4 +1,5 @@
 <?php require_once("_ui.php"); ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +10,18 @@
 	<script src="ui.js"></script>
 </head>
 <body>
-<div id="days-container">
+<header>
+	<a href="/planer"><h1>Heute ist <?php echo day_weekday(); ?>, der <?php echo day_label(date("Y-m-d"), true); ?></h1></a>
+	<section id="navigation">
+		<a href="/planer?from=<?php echo $jump_view_back; ?>"><<</a>
+		<a href="/planer?from=<?php echo $jump_day_back; ?>"><</a>
+		<a href="/planer?from=<?php echo date_create()->format("Y-m-d"); ?>">Heute</a>
+		<a href="/planer?from=<?php echo $jump_day_forward; ?>">></a>
+		<a href="/planer?from=<?php echo $jump_view_forward; ?>">>></a>
+	</section>
+</header>
+
+<section id="days-container">
 	<?php $i = 1;
 	foreach ($days as $day => $tasks): ?>
 		<section class="day" data-date="<?php echo $day; ?>" id="day-<?php echo $i; ?>">
@@ -24,6 +36,6 @@
 		</section>
 		<?php $i++;
 	endforeach; ?>
-</div>
+</section>
 </body>
 </html>

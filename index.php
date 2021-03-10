@@ -67,5 +67,12 @@ while($row = $pastsql->fetch(PDO::FETCH_OBJ)) {
 $from = !isset($_GET['from']) ? $from = date_sub(date_create(), new DateInterval('P1D'))->format('Y-m-d') : $_GET['from'];
 $days = read_items_from_database($conn, $from);
 
+// Generate days for jumping
+// Again, waste some computing time because we cannot use variables because PHP is weird
+$jump_view_back = date_sub(date_create($from), new DateInterval('P8D'))->format('Y-m-d');
+$jump_day_back = date_sub(date_create($from), new DateInterval('P1D'))->format('Y-m-d');
+$jump_day_forward = date_add(date_create($from), new DateInterval('P1D'))->format('Y-m-d');
+$jump_view_forward = date_add(date_create($from), new DateInterval('P8D'))->format('Y-m-d');
+
 // Display main page
 include('start.php');
