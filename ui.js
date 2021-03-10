@@ -8,9 +8,11 @@ window.onload = function () {
     $("body").on("keypress", null, null, function (e) {
         // Which tasks operate on?
         task_ids = [];
+        commands = [];
         additional = null;
+        selected_days = $(".selected");
 
-        $(".selected").each(function () {
+        selected_days.each(function () {
             task_ids.push(this.id.substring(5));
         });
 
@@ -28,10 +30,11 @@ window.onload = function () {
                 // del
                 commands = ["delete"];
                 break;
+            // Durations
             case 49:
-            // 1 for set duration to 1x 15min
+                // 1 for set duration to 1x 15min
             case 50:
-            // 2 for set duration to 2x 15min = 30min etc
+                // 2 for set duration to 2x 15min = 30min etc
             case 51:
             case 52:
             case 53:
@@ -41,10 +44,39 @@ window.onload = function () {
                 commands = ["duration"];
                 additional = (e.which - 48) * 15 * 60;
                 break;
+            // Move
+            // Q W E R for the first row
+            // tricky code: use switch fallthrough but avoid overriding variable
+            case 113:
+                day_id = 1;
+            case 119:
+                if(typeof day_id === "undefined") day_id = 2;
+            case 101:
+                if(typeof day_id === "undefined") day_id = 3;
+            case 114:
+                if(typeof day_id === "undefined") day_id = 4;
+            // Z U I O for the second row
+            case 122:
+                if(typeof day_id === "undefined") day_id = 5;
+            case 117:
+                if(typeof day_id === "undefined") day_id = 6;
+            case 105:
+                if(typeof day_id === "undefined") day_id = 7;
+            case 111:
+                if(typeof day_id === "undefined") day_id = 8;
+                additional = $("#day-" + day_id).attr("data-date");
+                commands = ["move"];
+                break;
+            // Today
+            case 116:
+                commands = ["today"];
+                break;
             case 32:
                 // space for abort all
-                $(".selected").removeClass("selected");
+                selected_days.removeClass("selected");
                 break;
+            default:
+                return;
         }
         if (typeof commands !== "undefined") {
             $.ajax({

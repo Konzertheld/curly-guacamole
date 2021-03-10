@@ -33,6 +33,9 @@ foreach (explode(",", $_GET["commands"]) as $command) {
 			}
 			echo $conn->commit();
 			break;
+		case "move":
+			echo move_task($conn, $task_ids, date_create($_GET["additional_data"])->format("Y-m-d"));
+			break;
 	}
 }
 echo "end";

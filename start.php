@@ -11,7 +11,7 @@
 </head>
 <body>
 <header>
-	<a href="/planer"><h1>Heute ist <?php echo day_weekday(); ?>, der <?php echo day_label(date("Y-m-d"), true); ?></h1></a>
+	<a href="/planer"><h1 data-date="<?php echo $today; ?>">Heute ist <?php echo day_weekday(); ?>, der <?php echo day_label(date("Y-m-d"), true); ?></h1></a>
 	<section id="navigation">
 		<a href="/planer?from=<?php echo $jump_view_back; ?>"><<</a>
 		<a href="/planer?from=<?php echo $jump_day_back; ?>"><</a>
