@@ -8,6 +8,8 @@ window.onload = function () {
     $("body").on("keypress", null, null, function (e) {
         // Which tasks operate on?
         task_ids = [];
+        additional = null;
+
         $(".selected").each(function () {
             task_ids.push(this.id.substring(5));
         });
@@ -34,7 +36,10 @@ window.onload = function () {
             case 52:
             case 53:
             case 54:
+            case 55:
+            case 56: // 2 hours
                 commands = ["duration"];
+                additional = (e.which - 48) * 15 * 60;
                 break;
             case 32:
                 // space for abort all
@@ -46,7 +51,8 @@ window.onload = function () {
                 url: "/planer/_api.php",
                 data: {
                     task_ids: task_ids.join(","),
-                    commands: commands.join(",")
+                    commands: commands.join(","),
+                    additional_data: additional
                 },
                 success: function (result) {
                     window.location.reload(true);

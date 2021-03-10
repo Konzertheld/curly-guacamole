@@ -23,6 +23,16 @@ foreach (explode(",", $_GET["commands"]) as $command) {
 			}
 			echo $conn->commit();
 			break;
+		case "duration":
+			$done = $conn->prepare('UPDATE tasks SET duration=:duration WHERE id = :id');
+			$conn->beginTransaction();
+			foreach ($task_ids as $task_id) {
+				$done->bindValue(':id', $task_id);
+				$done->bindValue(':duration', $_GET["additional_data"]);
+				$done->execute();
+			}
+			echo $conn->commit();
+			break;
 	}
 }
 echo "end";
