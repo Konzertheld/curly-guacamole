@@ -73,6 +73,7 @@ $jump_view_back = date_sub(date_create($from), new DateInterval('P8D'))->format(
 $jump_day_back = date_sub(date_create($from), new DateInterval('P1D'))->format('Y-m-d');
 $jump_day_forward = date_add(date_create($from), new DateInterval('P1D'))->format('Y-m-d');
 $jump_view_forward = date_add(date_create($from), new DateInterval('P8D'))->format('Y-m-d');
+$today = date_create()->format("Y-m-d");
 
 // Display main page
 include('start.php');

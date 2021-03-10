@@ -15,7 +15,7 @@
 	<section id="navigation">
 		<a href="/planer?from=<?php echo $jump_view_back; ?>"><<</a>
 		<a href="/planer?from=<?php echo $jump_day_back; ?>"><</a>
-		<a href="/planer?from=<?php echo date_create()->format("Y-m-d"); ?>">Heute</a>
+		<a href="/planer?from=<?php echo $today; ?>">Heute</a>
 		<a href="/planer?from=<?php echo $jump_day_forward; ?>">></a>
 		<a href="/planer?from=<?php echo $jump_view_forward; ?>">>></a>
 	</section>
