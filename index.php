@@ -63,7 +63,9 @@ while($row = $pastsql->fetch(PDO::FETCH_OBJ)) {
 }
 
 // Get items for the next 8 days
-$days = read_items_from_database($conn, $_GET['from']); // TODO make this safe
+// TODO make this safe
+$from = !isset($_GET['from']) ? $from = date_sub(date_create(), new DateInterval('P1D'))->format('Y-m-d') : $_GET['from'];
+$days = read_items_from_database($conn, $from);
 
 // Display main page
 include('start.php');
