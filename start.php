@@ -1,3 +1,4 @@
+<?php require_once("_ui.php"); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,7 +13,7 @@
 	<?php $i = 1;
 	foreach ($days as $day => $tasks): ?>
 		<section class="day" id="day-<?php echo $i; ?>">
-			<h1 class="day-heading"><?php echo $day; ?></h1>
+			<h1 class="day-heading"><?php echo day_label($day); ?></h1>
 			<ul><?php foreach ($tasks as $task): ?>
 					<li id="task-<?php echo $task->id; ?>" class="task <?php if ($task->done) echo 'done'; else echo 'undone'; ?>"><h2 class="task-heading"><?php echo $task->description; ?></h2>
 						<span class="deadline"><?php echo $task->deadline_day; ?></span>

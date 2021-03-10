@@ -93,7 +93,7 @@ function write_items_to_database(PDO $conn, $items)
 function read_items_from_database(PDO $conn, $from = null)
 {
 	if (empty($from)) {
-		$from = date('Y-m-d');
+		$from = date_sub(date_create(), new DateInterval('P1D'))->format('Y-m-d');
 	}
 	$read = $conn->prepare('SELECT id, description, duration, date, advance_span, deadline_day, deadline_time, done FROM tasks WHERE date >= :today AND date < :date ORDER BY date ASC, done ASC');
 	$read->bindValue(':today', date_create($from)->format('Y-m-d'));
