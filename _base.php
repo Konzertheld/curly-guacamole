@@ -63,29 +63,22 @@ function write_items_to_database(PDO $conn, $items)
 	// Write events to database
 	// TODO this is so google specific it should not be here
 	$ioi = $conn->prepare('INSERT OR IGNORE INTO tasks (description, duration, date, google_id, deadline_day) VALUES (:description, :duration, :date, :google_id, :deadline_day)');
-	$upd = $conn->prepare('UPDATE tasks SET description=:description, duration=:duration, date=:date, deadline_day=:deadline_day WHERE google_id=:google_id');
 	$conn->beginTransaction();
 	foreach ($items as $item) {
 		$start = google_create_date($item->start);
 		$end = google_create_date($item->end);
 		$duration = calculate_duration($start, $end);
 		$ioi->bindValue(':description', $item->summary);
-		$upd->bindValue(':description', $item->summary);
 		$ioi->bindValue(':google_id', $item->id);
 		$upd->bindValue(':google_id', $item->id);
 		if (google_is_appointment($item)) {
 			$ioi->bindValue(':deadline_day', $end->format('Y-m-d'));
-			$upd->bindValue(':deadline_day', $end->format('Y-m-d'));
 		} else {
 			$ioi->bindValue(':deadline_day', null);
-			$upd->bindValue(':deadline_day', null);
 		}
 		$ioi->bindValue(':duration', $duration, PDO::PARAM_INT);
-		$upd->bindValue(':duration', $duration, PDO::PARAM_INT);
 		$ioi->bindValue(':date', $start->format('Y-m-d'));
-		$upd->bindValue(':date', $start->format('Y-m-d'));
 		$ioi->execute();
-		$upd->execute();
 	}
 	return $conn->commit();
 }
