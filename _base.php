@@ -70,7 +70,6 @@ function write_items_to_database(PDO $conn, $items)
 		$duration = calculate_duration($start, $end);
 		$ioi->bindValue(':description', $item->summary);
 		$ioi->bindValue(':google_id', $item->id);
-		$upd->bindValue(':google_id', $item->id);
 		if (google_is_appointment($item)) {
 			$ioi->bindValue(':deadline_day', $end->format('Y-m-d'));
 		} else {
