@@ -25,7 +25,7 @@ google_write_items_to_database($conn, $google_items);
 
 // Handle past tasks #8
 // Get'em
-$pastsql = $conn->prepare('SELECT * FROM tasks WHERE date < :date AND done = 0');
+$pastsql = $conn->prepare('SELECT * FROM tasks LEFT JOIN tasks_tags ON tasks.id = tasks_tags.task_id AND tasks_tags.tag_name = "expired" WHERE date < :date AND done = 0 AND tasks_tags.tag_name IS NULL');
 $pastsql->bindValue(':date', date('Y-m-d'));
 $pastsql->execute();
 $today = date('Y-m-d');
@@ -36,8 +36,7 @@ while($row = $pastsql->fetch(PDO::FETCH_OBJ)) {
 			move_task($conn, $row->id, $day);
 			tag_task($conn, $row->id, 'overdue');
 		}
-		elseif($row->deadline < $today) {
-			// TODO: This will be called every time until the task is handled; that's not too bad but it's also not nice
+		elseif($row->deadline_day < $today) {
 			tag_task($conn, $row->id, 'expired');
 		}
 		elseif($row->deadline_day >= $day) {
