@@ -21,7 +21,8 @@ CREATE TABLE "tags" (
 
 CREATE TABLE "tasks_tags" (
 	"task_id"	INTEGER NOT NULL,
-	"tag_name"	TEXT NOT NULL
+	"tag_name"	TEXT NOT NULL,
+	UNIQUE("task_id","tag_name")
 );
 
 INSERT INTO tags (name) VALUES ("overdue");

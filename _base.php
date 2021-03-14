@@ -157,7 +157,6 @@ function done_task(PDO $conn, $task_ids)
 
 function tag_task(PDO $conn, $id, $tag)
 {
-	// TODO BUG this inserts rows again, ignore does not work
 	$ioi = $conn->prepare('INSERT OR IGNORE INTO tasks_tags (task_id, tag_name) VALUES (:id, :tag)');
 	$ioi->bindValue(':id', $id);
 	$ioi->bindValue(':tag', $tag);
