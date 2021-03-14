@@ -33,19 +33,23 @@ while($row = $pastsql->fetch(PDO::FETCH_OBJ)) {
 	// as outlined in #8
 	if($day = get_next_day_with_free_space($conn, $row->duration)) {
 		if($row->deadline_day == NULL) {
+			// no deadline, move to next free day and tag
 			move_task($conn, $row->id, $day);
 			tag_task($conn, $row->id, 'overdue');
 		}
 		elseif($row->deadline_day < $today) {
+			// expired deadline, tag and do nothing
 			tag_task($conn, $row->id, 'expired');
 		}
 		elseif($row->deadline_day >= $day) {
+			// unexpired deadline & next free day is within the deadline, move
 			move_task($conn, $row->id, $day);
 		}
 		else {
+			// unexpired deadline but next free day is not within the deadline, try to make room
 			$day = get_next_day_with_free_space($conn, $row->duration, true);
 			if($row->deadline_day >= $day) {
-				// TODO handle this case
+				// TODO handle this case (we could move the task to a day within the deadline when other tasks are moved)
 			}
 			else {
 				// your schedule is way too full!
