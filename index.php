@@ -21,7 +21,7 @@ $conn = new PDO('sqlite:' . __DIR__ . '/data/data.db');
 // Update database from Google
 // @TODO Check if we need to get Google data
 $google_items = google_get_next_events($config);
-write_items_to_database($conn, $google_items);
+google_write_items_to_database($conn, $google_items);
 
 // Handle past tasks #8
 // Get'em

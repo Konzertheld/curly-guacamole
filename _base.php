@@ -58,30 +58,6 @@ function calculate_duration(DateTime $d1, DateTime $d2)
 	return $diff->d * 3600 * 24 + $diff->h * 3600 + $diff->i * 60 + $diff->s;
 }
 
-function write_items_to_database(PDO $conn, $items)
-{
-	// Write events to database
-	// TODO this is so google specific it should not be here
-	$ioi = $conn->prepare('INSERT OR IGNORE INTO tasks (description, duration, date, google_id, deadline_day) VALUES (:description, :duration, :date, :google_id, :deadline_day)');
-	$conn->beginTransaction();
-	foreach ($items as $item) {
-		$start = google_create_date($item->start);
-		$end = google_create_date($item->end);
-		$duration = calculate_duration($start, $end);
-		$ioi->bindValue(':description', $item->summary);
-		$ioi->bindValue(':google_id', $item->id);
-		if (google_is_appointment($item)) {
-			$ioi->bindValue(':deadline_day', $end->format('Y-m-d'));
-		} else {
-			$ioi->bindValue(':deadline_day', null);
-		}
-		$ioi->bindValue(':duration', $duration, PDO::PARAM_INT);
-		$ioi->bindValue(':date', $start->format('Y-m-d'));
-		$ioi->execute();
-	}
-	return $conn->commit();
-}
-
 function read_items_from_database(PDO $conn, $from = null)
 {
 	$read = $conn->prepare('SELECT id, description, duration, date, advance_span, deadline_day, deadline_time, done FROM tasks WHERE date >= :today AND date < :date ORDER BY date ASC, done ASC');

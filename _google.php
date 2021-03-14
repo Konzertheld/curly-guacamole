@@ -33,3 +33,27 @@ function google_get_next_events($config)
 	file_put_contents('data/config.json', json_encode($config));
 	return $json->items;
 }
+
+function google_write_items_to_database(PDO $conn, $items)
+{
+	// Write events to database
+	// TODO this is so google specific it should not be here
+	$ioi = $conn->prepare('INSERT OR IGNORE INTO tasks (description, duration, date, google_id, deadline_day) VALUES (:description, :duration, :date, :google_id, :deadline_day)');
+	$conn->beginTransaction();
+	foreach ($items as $item) {
+		$start = google_create_date($item->start);
+		$end = google_create_date($item->end);
+		$duration = calculate_duration($start, $end);
+		$ioi->bindValue(':description', $item->summary);
+		$ioi->bindValue(':google_id', $item->id);
+		if (google_is_appointment($item)) {
+			$ioi->bindValue(':deadline_day', $end->format('Y-m-d'));
+		} else {
+			$ioi->bindValue(':deadline_day', null);
+		}
+		$ioi->bindValue(':duration', $duration, PDO::PARAM_INT);
+		$ioi->bindValue(':date', $start->format('Y-m-d'));
+		$ioi->execute();
+	}
+	return $conn->commit();
+}
