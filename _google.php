@@ -24,14 +24,18 @@ function google_get_next_events($config)
 	// @TODO limit to 4 weeks
 	// @TODO handle multiple pages - Google returns plenty, but we must not rely on the first page to contain everything we need
 	// TODO get events since we last loaded, not from now
-	$url = 'https://www.googleapis.com/calendar/v3/calendars/' . $config->google_calendars[0] . '/events';
-	$params['singleEvents'] = 'true';
-	$params['orderBy'] = 'startTime';
-	$params['timeMin'] = $from;
-	$json = get_json_google($url, $params);
+	$items = [];
+	for($i = 0; $i < count($config->google_calendars); $i++) {
+		$url = 'https://www.googleapis.com/calendar/v3/calendars/' . $config->google_calendars[$i] . '/events';
+		$params['singleEvents'] = 'true';
+		$params['orderBy'] = 'startTime';
+		$params['timeMin'] = $from;
+		$json = get_json_google($url, $params);
+		$items = array_merge($items, $json->items);
+	}
 	$config->last_google_check = $now;
 	file_put_contents('data/config.json', json_encode($config));
-	return $json->items;
+	return $items;
 }
 
 function google_write_items_to_database(PDO $conn, $items)
