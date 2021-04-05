@@ -1,5 +1,5 @@
 <?php
-function day_label($date, $suppress_suffix = false): string
+function day_label($date, $suppress_prefix = false, $suppress_weekday = false): string
 {
 	// Note: Timezones don't matter because both dates are in the same timezone (UTC)
 	// Note that we cannot use a variable for today because it would get modified in the function calls below
@@ -7,14 +7,17 @@ function day_label($date, $suppress_suffix = false): string
 	$oneday = new DateInterval('P1D');
 	$day = date_create($date);
 
-	return ($suppress_suffix ? "" :
+	return (
+		$suppress_prefix ? "" :
 		match ($date) {
 			date_create()->format("Y-m-d") => "Heute - ",
 			date_add(date_create(), $oneday)->format("Y-m-d") => "Morgen - ",
 			date_sub(date_create(), $oneday)->format("Y-m-d") => "Gestern - ",
 			default => ""
-		})
+		}
 		. ' '
+		)
+		. ($suppress_weekday ? "" : day_weekday($date) . ', ')
 		. $day->format("d.")
 		. " "
 		. match (substr($date, 5, 2)) {
@@ -45,3 +48,5 @@ function day_weekday($date = null) {
 		default => ""
 	};
 }
+
+$day_shortcut_assignments = [1 => "Q", 2 => "W", 3 => "E", 4 => "R", 5 => "Z", 6 => "U", 7 => "I", 8 => "O"];

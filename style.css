@@ -77,6 +77,13 @@ header h1 {
     background: #143a5e;
 }
 
+span.shortcut-tip {
+    float: left;
+    margin: 0;
+    padding: 3px 3px 3px 10px;
+    font-size: 1.17em;
+}
+
 .day {
     width: 25%;
     box-sizing: border-box;
