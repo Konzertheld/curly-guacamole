@@ -40,7 +40,6 @@ function google_get_next_events($config)
 function google_write_items_to_database(PDO $conn, $items)
 {
 	// Write events to database
-	// TODO this is so google specific it should not be here
 	$ioi = $conn->prepare('INSERT OR IGNORE INTO tasks (description, duration, date, google_id, deadline_day) VALUES (:description, :duration, :date, :google_id, :deadline_day)');
 	$conn->beginTransaction();
 	foreach ($items as $item) {
