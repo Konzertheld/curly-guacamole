@@ -23,7 +23,6 @@ function google_get_next_events($config)
 	}
 	// @TODO limit to 4 weeks
 	// @TODO handle multiple pages - Google returns plenty, but we must not rely on the first page to contain everything we need
-	// TODO get events since we last loaded, not from now
 	$items = [];
 	for($i = 0; $i < count($config->google_calendars); $i++) {
 		$url = 'https://www.googleapis.com/calendar/v3/calendars/' . $config->google_calendars[$i] . '/events';
