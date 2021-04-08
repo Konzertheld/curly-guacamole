@@ -12,12 +12,19 @@ function google_is_appointment($item)
 	return property_exists($item->start, "dateTime") && property_exists($item->end, "dateTime");
 }
 
-function google_get_next_events($config)
+function google_get_next_events($config, $force_reload = false)
 {
 	// Get next Google events from now
 	$now = date(DATE_RFC3339);
 	if (property_exists($config, 'last_google_check')) {
 		$from = $config->last_google_check;
+		// check if last call to Google was less than caching time ago
+		// TODO make configurable
+		// weird code. Explanation: check if last check + 15min is in the future by checking if we need to go backwards from there to get to now.
+		// note the PT that is necessary because weird PHP uses M for months and minutes whyyyyy it does not in date()
+		if(!$force_reload && date_diff(date_add(date_create($from), new DateInterval("PT15M")), date_create($now))->invert == 1) {
+			return [];
+		}
 	} else {
 		$from = $now;
 	}

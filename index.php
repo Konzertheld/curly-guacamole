@@ -19,8 +19,8 @@ $config = json_decode(file_get_contents('data/config.json'));
 $conn = new PDO('sqlite:' . __DIR__ . '/data/data.db');
 
 // Update database from Google
-// @TODO Check if we need to get Google data
-$google_items = google_get_next_events($config);
+$force_reload = isset($_GET['nocache']) && $_GET['nocache'] == 1;
+$google_items = google_get_next_events($config, $force_reload);
 google_write_items_to_database($conn, $google_items);
 
 // Handle past tasks #8
