@@ -49,4 +49,12 @@ function day_weekday($date = null) {
 	};
 }
 
+function day_label_deadline($deadline_day, $day) {
+	if($deadline_day == $day) {
+		return "An diesem Tag";
+	}
+	$deadline_date = date_create($deadline_day);
+	return $deadline_date->format("d.m.Y");
+}
+
 $day_shortcut_assignments = [1 => "Q", 2 => "W", 3 => "E", 4 => "R", 5 => "Z", 6 => "U", 7 => "I", 8 => "O"];

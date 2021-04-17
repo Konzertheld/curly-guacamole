@@ -124,3 +124,7 @@ li.task.selected, li.task.selected h2 {
 li.task.selected.done, li.task.selected.done h2 {
     color: #dd7777;
 }
+
+.deadline {
+    color: #dd7777;
+}
