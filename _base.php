@@ -73,12 +73,13 @@ function read_items_from_database(PDO $conn, $from = null)
 	return $days;
 }
 
-function get_next_day_with_free_space(PDO $conn, $space_needed, $deadline_only = false)
+function get_next_day_with_free_space(PDO $conn, $space_needed, $regarding_deadline_only = false)
 {
 	// TODO: Get additional time per task (20 min = 1200 seconds) from config
 	// Get future days including today with their used time from the database
 	// Why include today? There might still be time left
-	if ($deadline_only) {
+	// TODO merge statements using ?:
+	if ($regarding_deadline_only) {
 		$stmt = $conn->prepare('SELECT date, SUM(duration) + COUNT(id) * 1200 usedtime FROM tasks WHERE date >= :date AND deadline_day IS NOT NULL GROUP BY date');
 	} else {
 		$stmt = $conn->prepare('SELECT date, SUM(duration) + COUNT(id) * 1200 usedtime FROM tasks WHERE date >= :date GROUP BY date');
@@ -97,6 +98,7 @@ function get_next_day_with_free_space(PDO $conn, $space_needed, $deadline_only =
 	for ($i = 0; $i < 30; $i++) {
 		$date = date_add(date_create(), new DateInterval(('P' . $i . 'D')))->format('Y-m-d');
 		$position = array_search($date, $days_merged['date']);
+		// TODO load maximum usedtime per day from config
 		if ($position === false || $days_merged['usedtime'][$position] + $space_needed < 9 * 3600) {
 			// TODO: Load maximum day load (9h) from config
 			return $date;
@@ -106,8 +108,56 @@ function get_next_day_with_free_space(PDO $conn, $space_needed, $deadline_only =
 	return false;
 }
 
+function make_space(PDO $conn, $day, $space_needed) {
+	// check if space_needed is larger than maximum time usage per day
+	// TODO load that from config
+	if($space_needed > (9 * 3600)) {
+		return false;
+	}
+
+	// check how much space is already free
+	$stmt = $conn->prepare('SELECT SUM(duration) + COUNT(id) * 1200 usedtime FROM tasks WHERE date = :date GROUP BY date');
+	$stmt->bindValue(':date', $day);
+	$stmt->execute();
+	$result_all = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	$freetime = 9 * 3600 - $result_all[0]["usedtime"];
+	// return if it is enough
+	if($freetime >= $space_needed) {
+		return true;
+	}
+	// check how much space can be freed - tasks with deadline are not allowed to be moved
+	$stmt = $conn->prepare('SELECT SUM(duration) + COUNT(id) * 1200 usedtime FROM tasks WHERE date = :date AND deadline_day IS NOT NULL GROUP BY date');
+	$stmt->bindValue(':date', $day);
+	$stmt->execute();
+	$result_deadline = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	$uncriticaltime = 9 * 3600 - $result_deadline[0]["usedtime"];
+	// return if it is not enough
+	if($uncriticaltime < $space_needed) {
+		return false;
+	}
+	// iterate over non-deadline tasks and move them until enough time is free
+	// TODO order by... whatever
+	$stmt = $conn->prepare('SELECT id, duration FROM tasks WHERE date = :date AND deadline_day IS NULL');
+	$stmt->bindValue(':date', $day);
+	$stmt->execute();
+	while($freetime < $space_needed && $task = $stmt->fetch(PDO::FETCH_ASSOC)) {
+		$move_one = move_task($conn, $task["id"], get_next_day_with_free_space($conn, $task["duration"]));
+		if(!$move_one) {
+			return false; // damnit
+		}
+		$freetime += $task["duration"];
+	}
+
+	return $freetime >= $space_needed; // at this point, if false is returned, something went really wrong
+}
+
 function move_task(PDO $conn, $id, $date)
 {
+	if($date == false) {
+		// propably called from make_space()
+		return false;
+	}
+
 	if (!is_array($id)) $id = [$id];
 	$upd = $conn->prepare('UPDATE tasks SET date=:date WHERE id=:id');
 	$conn->beginTransaction();

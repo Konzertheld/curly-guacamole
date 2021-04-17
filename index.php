@@ -50,6 +50,14 @@ while($row = $pastsql->fetch(PDO::FETCH_OBJ)) {
 			$day = get_next_day_with_free_space($conn, $row->duration, true);
 			if($row->deadline_day >= $day) {
 				// TODO handle this case (we could move the task to a day within the deadline when other tasks are moved)
+				if(make_space($conn, $day, $row->duration)) {
+					move_task($conn, $row->id, $day);
+				}
+				else {
+					// this is not good
+					// TODO handle this case
+					die("serious error, moving a deadline task to somewhere within the deadline where supposedly was enough free space failed");
+				}
 			}
 			else {
 				// your schedule is way too full!
