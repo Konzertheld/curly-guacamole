@@ -60,7 +60,7 @@ function calculate_duration(DateTime $d1, DateTime $d2)
 
 function read_items_from_database(PDO $conn, $from = null)
 {
-	$read = $conn->prepare('SELECT id, description, duration, date, advance_span, deadline_day, deadline_time, done FROM tasks WHERE date >= :today AND date < :date ORDER BY date ASC, done ASC');
+	$read = $conn->prepare('SELECT id, description, duration, date, advance_span, deadline_day, deadline_time, done FROM tasks WHERE date >= :today AND date < :date ORDER BY date ASC, done ASC, deadline_day IS NULL, deadline_day');
 	$read->bindValue(':today', date_create($from)->format('Y-m-d'));
 	$read->bindValue(':date', date_add(date_create($from), new DateInterval('P8D'))->format('Y-m-d'));
 	$read->execute();
