@@ -171,7 +171,7 @@ function move_task(PDO $conn, $id, $date)
 
 function done_task(PDO $conn, $task_ids)
 {
-	if (!is_array($task_ids)) $id = [$task_ids];
+	if (!is_array($task_ids)) $task_ids = [$task_ids];
 	$done = $conn->prepare('UPDATE tasks SET done=((done | 1) - (done & 1)) WHERE id = :id');
 	$conn->beginTransaction();
 	foreach ($task_ids as $task_id) {
