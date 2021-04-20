@@ -50,6 +50,8 @@ function day_weekday($date = null) {
 }
 
 function day_label_deadline($deadline_day, $day) {
+	// TODO wenn deadline_day == day == heute return "Heute"
+	// wenn day == heute und deadline_day > heute return "in X Tagen"
 	if($deadline_day == $day) {
 		return "An diesem Tag";
 	}
@@ -57,4 +59,5 @@ function day_label_deadline($deadline_day, $day) {
 	return $deadline_date->format("d.m.Y");
 }
 
+// subtract 2 to get position relative to selected day
 $day_shortcut_assignments = [1 => "Q", 2 => "W", 3 => "E", 4 => "R", 5 => "Z", 6 => "U", 7 => "I", 8 => "O"];
