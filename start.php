@@ -22,7 +22,7 @@
 </header>
 
 <section id="new-event">
-	<input id="new-event-input" type="text">
+	<input id="new-event-input" type="text" autofocus>
 </section>
 
 <section id="days-container">
