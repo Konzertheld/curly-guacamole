@@ -2,7 +2,7 @@ CREATE TABLE "tasks" (
 	"id"	INTEGER NOT NULL UNIQUE,
 	"description"	TEXT DEFAULT NULL COLLATE NOCASE,
 	"duration"	INTEGER NOT NULL,
-	"date"	TEXT NOT NULL,
+	"date"	TEXT,
 	"advance_span"	INTEGER,
 	"deadline_day"	INTEGER DEFAULT NULL,
 	"deadline_time"	INTEGER DEFAULT NULL,
