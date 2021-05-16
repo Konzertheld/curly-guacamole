@@ -21,6 +21,10 @@
 	</section>
 </header>
 
+<section id="new-event">
+	<input id="new-event-input" type="text">
+</section>
+
 <section id="days-container">
 	<?php $i = 1;
 	foreach ($days as $day => $tasks): ?>

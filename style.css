@@ -42,7 +42,7 @@ header h1 {
     font-weight: normal;
 }
 
-#navigation {
+#navigation, #new-event {
     text-align: center;
     margin-bottom: 20px;
 }
@@ -53,6 +53,11 @@ header h1 {
     text-decoration: none;
     padding: 5px 10px;
 
+}
+
+#new-event-input {
+    font-size: 24px;
+    width: 30%;
 }
 
 #days-container {

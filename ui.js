@@ -6,6 +6,16 @@ window.onload = function () {
 
     // Keyboard shortcuts
     $("body").on("keypress", null, null, function (e) {
+        var tag = e.target.tagName.toLowerCase();
+        if(tag === "input" || tag === "textarea" || ($("#new-event-input")[0].value.trim() !== "")) {
+            // react to enter here
+            // call another function that can also be triggered by clicking on a day heading
+            // when clicking on a day heading, append date of that day to the input field and send TODO
+            if(e.which === 13) {
+                processTask();
+            }
+            return;
+        }
         // Which tasks operate on?
         task_ids = [];
         commands = [];
@@ -93,3 +103,16 @@ window.onload = function () {
         }
     });
 };
+
+function processTask() {
+    $.ajax({
+        url: "/planer/_api.php",
+        data: {
+            commands: "add",
+            task_string: $("#new-event-input")[0].value.trim()
+        },
+        success: function (result) {
+            window.location.reload(true);
+        }
+    });
+}

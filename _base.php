@@ -151,6 +151,20 @@ function make_space(PDO $conn, $day, $space_needed) {
 	return $freetime >= $space_needed; // at this point, if false is returned, something went really wrong
 }
 
+function create_task(PDO $conn, array $data) {
+	$valid_fields = ["description", "duration", "date", "advance_span", "deadline_day", "deadline_time", "recurrance_type", "recurrance_days", "done"];
+	$cleaned_data = array_filter($data, function ($key) use($valid_fields) {
+		return in_array($key, $valid_fields);
+	}, ARRAY_FILTER_USE_KEY);
+
+	$stmt = "INSERT INTO tasks (" . implode(", ", array_keys($cleaned_data)) . ") VALUES (:" . implode(", :", array_keys($cleaned_data)) .")";
+	$query = $conn->prepare($stmt);
+	foreach($cleaned_data as $field_key => $field_data) {
+		$query->bindValue(":" . $field_key, $field_data);
+	}
+	return $query->execute();
+}
+
 function move_task(PDO $conn, $id, $date)
 {
 	if($date == false) {
