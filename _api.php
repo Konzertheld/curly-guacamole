@@ -4,7 +4,9 @@ require_once("_base.php");
 // this is so unsafe lol, don't use this on a non-local host
 // TODO: redundant, opening database also happens in index.php
 $conn = new PDO('sqlite:' . __DIR__ . '/data/data.db');
-$task_ids = explode(",", $_GET["task_ids"]);
+if(isset($_GET["task_ids"])) {
+	$task_ids = explode(",", $_GET["task_ids"]);
+}
 
 foreach (explode(",", $_GET["commands"]) as $command) {
 	switch ($command) {
