@@ -73,29 +73,30 @@ foreach (explode(",", $_GET["commands"]) as $command) {
 			// find YYYY-MM-DD and MM-DD, with or wihout +-NNN suffix
 			$regex = "/(?:^| )([0-9]{4}-)?([0-9]{2}-[0-9]{2})([-+][0-9]+)?(?:$| )/";
 			if (preg_match_all($regex, $task_string, $matches) > 0) {
-				if (count($matches[1]) > 1) {
-					// TODO error handling for more than one match
-				} else {
-					// add year if necessary
-					$datestr = (empty($matches[1][0]) ? date("Y") . "-" : $matches[1][0]) . $matches[2][0];
-					// process deadline info
-					if (!empty($matches[3][0])) {
-						$span = substr($matches[3][0], 1);
-						if (substr($matches[3][0], 0, 1) == "+") {
-							$data["date"] = $datestr;
-							$data["deadline_day"] = date_add(date_create($datestr), new DateInterval(('P' . $span . 'D')))->format('Y-m-d');
-						} else {
-							$data["deadline_day"] = $datestr;
-							$data["date"] = date_sub(date_create($datestr), new DateInterval(('P' . $span . 'D')))->format('Y-m-d');
-						}
-						$data["advance_span"] = $span;
-					} else {
+				// add year if necessary
+				$datestr = (empty($matches[1][0]) ? date("Y") . "-" : $matches[1][0]) . $matches[2][0];
+				// process deadline info
+				if (!empty($matches[3][0])) {
+					$span = substr($matches[3][0], 1);
+					if (substr($matches[3][0], 0, 1) == "+") {
 						$data["date"] = $datestr;
+						$data["deadline_day"] = date_add(date_create($datestr), new DateInterval(('P' . $span . 'D')))->format('Y-m-d');
+					} else {
+						$data["deadline_day"] = $datestr;
+						$data["date"] = date_sub(date_create($datestr), new DateInterval(('P' . $span . 'D')))->format('Y-m-d');
 					}
-					// date successfully processed, remove it from string
-					// note: this is another method, use full match with trim (see above)
-					$task_string = str_replace(trim($matches[0][0]), "", $task_string);
+					$data["advance_span"] = $span;
+				} else {
+					$data["date"] = $datestr;
 				}
+				// date successfully processed, remove it from string
+				// note: this is another method, use full match with trim (see above)
+				$task_string = str_replace(trim($matches[0][0]), "", $task_string);
+			}
+
+			// process other parameters
+			if(isset($_GET["done"]) && $_GET["done"]) {
+				$data["done"] = true;
 			}
 
 			// use the rest as description

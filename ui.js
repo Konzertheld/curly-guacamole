@@ -12,7 +12,7 @@ window.onload = function () {
             // call another function that can also be triggered by clicking on a day heading
             // when clicking on a day heading, append date of that day to the input field and send TODO
             if(e.which === 13) {
-                processTask();
+                processTask(e);
             }
             return;
         }
@@ -104,13 +104,18 @@ window.onload = function () {
     });
 };
 
-function processTask() {
+function processTask(e) {
+    var data = {
+        commands: "add",
+        task_string: $("#new-event-input")[0].value.trim()
+    };
+    if(e.shiftKey) {
+        data.done = true;
+        data.task_string += " " + $("#today").attr("data-date"); // this appends "today". Because only the first appearance of a data is processed, a manually added date will prevail
+    }
     $.ajax({
         url: "/planer/_api.php",
-        data: {
-            commands: "add",
-            task_string: $("#new-event-input")[0].value.trim()
-        },
+        data: data,
         success: function (result) {
             window.location.reload(true);
         }
