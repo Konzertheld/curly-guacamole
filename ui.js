@@ -124,9 +124,55 @@ function processTask(e) {
         commands: "add",
         task_string: $("#new-event-input")[0].value.trim()
     };
+    // check for day shortcuts
+    skip_shift_date = false;
+    const regex = /(?<= )[QWERTZUIOYqwertzuioy]$/g;
+    const shortcut_result = data.task_string.match(regex);
+    if(shortcut_result !== null) {
+        switch(shortcut_result[0].toUpperCase()) {
+            case "T":
+                date = $("#today").attr("data-date");
+                break;
+            case "Y":
+                date = $("#today").attr("data-yesterday");
+                break;
+            case "Q":
+                date = $("#day-1").attr("data-date");
+                break;
+            case "W":
+                date = $("#day-2").attr("data-date");
+                break;
+            case "E":
+                date = $("#day-3").attr("data-date");
+                break;
+            case "R":
+                date = $("#day-4").attr("data-date");
+                break;
+            case "Z":
+                date = $("#day-5").attr("data-date");
+                break;
+            case "U":
+                date = $("#day-6").attr("data-date");
+                break;
+            case "I":
+                date = $("#day-7").attr("data-date");
+                break;
+            case "O":
+                date = $("#day-8").attr("data-date");
+                break;
+        }
+        // replace the letter with the date
+        data.task_string = data.task_string.substring(0, data.task_string.length - 1) + date;
+        skip_shift_date = true;
+    }
+    // process shift key
+    // this appends "today". Because only the first appearance of a data is processed, a manually added date will prevail
+    // TODO: but then "today" will show up in the description, not cool!
     if(e.shiftKey) {
         data.done = true;
-        data.task_string += " " + $("#today").attr("data-date"); // this appends "today". Because only the first appearance of a data is processed, a manually added date will prevail
+        if(!skip_shift_date) {
+            data.task_string += " " + $("#today").attr("data-date");
+        }
     }
     $.ajax({
         url: "/planer/_api.php",

@@ -29,6 +29,7 @@ $pastsql = $conn->prepare('SELECT * FROM tasks LEFT JOIN tasks_tags ON tasks.id 
 $pastsql->bindValue(':date', date('Y-m-d'));
 $pastsql->execute();
 $today = date('Y-m-d');
+$yesterday = date_sub(date_create(), new DateInterval('P1D'))->format('Y-m-d');
 while($row = $pastsql->fetch(PDO::FETCH_OBJ)) {
 	// as outlined in #8
 	if($day = get_next_day_with_free_space($conn, $row->duration)) {
