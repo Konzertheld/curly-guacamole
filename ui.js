@@ -55,8 +55,8 @@ window.onload = function () {
                 additional = (e.which - 48) * 15 * 60;
                 break;
             // Move
-            // Q W E R for the first row
             // tricky code: use switch fallthrough but avoid overriding variable
+            // Q W E R for the first row
             case 113:
                 day_id = 1;
             case 119:
