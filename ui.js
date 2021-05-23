@@ -28,8 +28,9 @@ window.onload = function () {
 
         switch (e.which) {
             // Note that the order might be important
+            case 84:
             case 68:
-                // D for done and move to today
+                // D for done and move to today, also for uppercase T
                 commands = ["today", "done"];
                 break;
             case 100:
@@ -56,26 +57,40 @@ window.onload = function () {
                 break;
             // Move
             // tricky code: use switch fallthrough but avoid overriding variable
+            // for uppercase letters, add "done"
             // Q W E R for the first row
+            case 81:
             case 113:
                 day_id = 1;
+            case 87:
             case 119:
                 if(typeof day_id === "undefined") day_id = 2;
+            case 69:
             case 101:
                 if(typeof day_id === "undefined") day_id = 3;
+            case 82:
             case 114:
                 if(typeof day_id === "undefined") day_id = 4;
             // Z U I O for the second row
+            case 90:
             case 122:
                 if(typeof day_id === "undefined") day_id = 5;
+            case 85:
             case 117:
                 if(typeof day_id === "undefined") day_id = 6;
+            case 73:
             case 105:
                 if(typeof day_id === "undefined") day_id = 7;
+            case 79:
             case 111:
                 if(typeof day_id === "undefined") day_id = 8;
                 additional = $("#day-" + day_id).attr("data-date");
-                commands = ["move"];
+                if(e.shiftKey) {
+                    commands = ["done", "move"]
+                }
+                else {
+                    commands = ["move"];
+                }
                 break;
             // Today
             case 116:
