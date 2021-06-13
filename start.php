@@ -29,13 +29,15 @@
 	<?php $i = 1;
 	foreach ($days as $day => $tasks): ?>
 		<section class="day" data-date="<?php echo $day; ?>" id="day-<?php echo $i; ?>">
+			<?php // $daysum = day_sum($days, $day, $today); // This could be used to show percentage of day instead of target
+			$tasksum = 0; ?>
 			<span class="shortcut-tip"><?php echo $day_shortcut_assignments[$i]; ?></span><h1 class="day-heading"><?php echo day_label($day); ?></h1>
 			<ul><?php foreach ($tasks as $task): ?>
-					<li id="task-<?php echo $task->id; ?>" class="task <?php if ($task->done) echo 'done'; else echo 'undone'; ?>"><h2 class="task-heading"><?php echo $task->description; ?></h2>
+					<li id="task-<?php echo $task->id; ?>" class="task <?php if ($task->done) echo 'done'; else echo 'undone'; ?>" style="<?php echo duration_background_string($task->duration, $tasksum); ?>"><h2 class="task-heading"><?php echo $task->description; ?></h2>
 						<span class="duration"><?php echo $task->duration / 60; ?> min</span>
 						<?php if($task->deadline_day): ?><span class="deadline"><?php echo day_label_deadline($task->deadline_day, $day); ?></span><?php endif; ?>
 					</li>
-				<?php endforeach; ?>
+				<?php $tasksum += $task->duration; endforeach; ?>
 			</ul>
 		</section>
 		<?php $i++;

@@ -61,3 +61,26 @@ function day_label_deadline($deadline_day, $day) {
 
 // subtract 2 to get position relative to selected day
 $day_shortcut_assignments = [1 => "Q", 2 => "W", 3 => "E", 4 => "R", 5 => "Z", 6 => "U", 7 => "I", 8 => "O"];
+
+function day_sum($days, $day, $today, $include_not_past = false) {
+	if(!$include_not_past && $day >= $today)
+		return -1;
+	$sum = 0;
+	foreach($days[$day] as $task) {
+		$sum += $task->duration;
+	}
+	return $sum;
+}
+
+function duration_background_string($duration, $untilnow) {
+	// TODO: Load total from config, that is the max time we expect to get done on a day (see also _base.php)
+	$total = 9 * 3600;
+	if($untilnow > $total) {
+		return "background: linear-gradient(transparent 2px, #393939 2px), linear-gradient(90deg, #dd7733 0%, #dd7733 100%);";
+	}
+	elseif($untilnow + $duration > $total) {
+		return sprintf("background: linear-gradient(transparent 2px, #393939 2px), linear-gradient(90deg, #555 %1$.4f%% , #dd7733 %1$.4f%%, #dd7733 %2$.4f%%, #393939 %2$.4f%%", $untilnow / $total * 100, ($untilnow + $duration) / $total * 100);
+	}
+	// TODO: for some reason PHPStorm shows two warnings here that do not seem to be correct
+	return sprintf("background: linear-gradient(transparent 2px, #393939 2px), linear-gradient(90deg, #555 %1$.4f%% , #A6E22E %1$.4f%%, #A6E22E %2$.4f%%, #393939 %2$.4f%%", $untilnow / $total * 100, ($untilnow + $duration) / $total * 100);
+}
