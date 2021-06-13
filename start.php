@@ -37,7 +37,7 @@
 						<span class="duration"><?php echo $task->duration / 60; ?> min</span>
 						<?php if($task->deadline_day): ?><span class="deadline"><?php echo day_label_deadline($task->deadline_day, $day); ?></span><?php endif; ?>
 					</li>
-				<?php $tasksum += $task->duration; endforeach; ?>
+				<?php $tasksum += $task->duration + 1200; endforeach; ?>
 			</ul>
 		</section>
 		<?php $i++;
