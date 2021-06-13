@@ -74,7 +74,7 @@ function day_sum($days, $day, $today, $include_not_past = false) {
 
 function duration_background_string($duration, $untilnow) {
 	// TODO: Load total from config, that is the max time we expect to get done on a day (see also _base.php)
-	$total = 9 * 3600;
+	$total = 8 * 3600;
 	if($untilnow > $total) {
 		return "background: linear-gradient(transparent 2px, #393939 2px), linear-gradient(90deg, #dd7733 0%, #dd7733 100%);";
 	}
