@@ -98,9 +98,9 @@ function get_next_day_with_free_space(PDO $conn, $space_needed, $regarding_deadl
 	for ($i = 0; $i < 30; $i++) {
 		$date = date_add(date_create(), new DateInterval(('P' . $i . 'D')))->format('Y-m-d');
 		$position = array_search($date, $days_merged['date']);
-		// TODO load maximum usedtime per day from config (now: 8 * 3600 = 8 hours)
-		// 8 * 3600 is the maximum load per day. 20 min break per task are already included in the results from the database and added for the task in question
-		if ($position === false || $days_merged['usedtime'][$position] + $space_needed + 1200 < 8 * 3600) {
+		// TODO load maximum usedtime per day from config (now: 9 * 3600 = 9 hours)
+		// 9 * 3600 is the maximum load per day. 20 min break per task are already included in the results from the database and added for the task in question
+		if ($position === false || $days_merged['usedtime'][$position] + $space_needed + 1200 < 9 * 3600) {
 			// TODO: Load maximum day load (9h) from config
 			return $date;
 		}

@@ -74,7 +74,7 @@ function day_sum($days, $day, $today, $include_not_past = false) {
 
 function duration_background_string($duration, $untilnow) {
 	// TODO: Load total from config, that is the max time we expect to get done on a day (see also _base.php)
-	$total = 8 * 3600;
+	$total = 9 * 3600;
 	// include 20 min break into calculation
 	$duration += 1200;
 	if($untilnow > $total) {
