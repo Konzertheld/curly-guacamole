@@ -97,13 +97,13 @@ span.shortcut-tip {
 }
 
 .day ul {
-    padding: 10px;
+    padding: 5px 10px 8px 10px;
     margin: 0;
 }
 
 .day ul li {
     list-style-type: none;
-    margin: 0 0 10px 0;
+    margin: 0 0 7px 0;
 }
 
 li.task.undone + li.task.done {
@@ -113,9 +113,10 @@ li.task.undone + li.task.done {
 }
 
 .day ul li h2 {
-    margin: 0 0 3px 0;
+    margin: 0;
     font-weight: normal;
     color: #A6E22E;
+    font-size: 22px;
 }
 
 .day ul li.done h2 {
