@@ -73,8 +73,9 @@ function day_sum($days, $day) {
 function duration_background_string($duration, $untilnow, $show_full_scale = false) {
 	// TODO: Load total from config, that is the max time we expect to get done on a day (see also _base.php)
 	$total = 9 * 3600;
-	// include 20 min break into calculation
-	$duration += 1200;
+	// include 20 min break into calculation when in per-task mode
+	if(!$show_full_scale)
+		$duration += 1200;
 	if($untilnow > $total) {
 		return "background: linear-gradient(transparent 2px, #393939 2px), linear-gradient(90deg, #dd7733 0%, #dd7733 100%);";
 	}
