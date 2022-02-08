@@ -4,6 +4,12 @@ window.onload = function () {
         $(this).parent().toggleClass("selected");
     });
 
+    $("h1").on("click", null, null, function (e) {
+        var oldtext = $("#new-event-input").val();
+        $("#new-event-input").val(oldtext + $(this).parent().attr("data-date"));
+        $("#new-event-input").focus();
+    });
+
     // Keyboard shortcuts
     $("body").on("keypress", null, null, function (e) {
         var tag = e.target.tagName.toLowerCase();
