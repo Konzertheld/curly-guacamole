@@ -1,8 +1,7 @@
 <?php
 $google_token = null;
 
-function post($url, $params)
-{
+function post($url, $params) {
 	// use key 'http' even if you send the request to https://...
 	$options = array(
 		'http' => array(
@@ -19,8 +18,7 @@ function post($url, $params)
 	return $result;
 }
 
-function get_json_google($url, $params)
-{
+function get_json_google($url, $params) {
 	$authdata = json_decode(file_get_contents('data/google_token.json'));
 	$options = array(
 		'http' => array(
@@ -47,8 +45,7 @@ function get_json_google($url, $params)
 //    return post($url, $params);
 //}
 
-function calculate_duration(DateTime $d1, DateTime $d2)
-{
+function calculate_duration(DateTime $d1, DateTime $d2) {
 	$diff = $d1->diff($d2);
 	if ($diff->d == 1 && $diff->h == 0 && $diff->i == 0 && $diff->s == 0) {
 		// Google all-day event, return default duration
@@ -58,23 +55,21 @@ function calculate_duration(DateTime $d1, DateTime $d2)
 	return $diff->d * 3600 * 24 + $diff->h * 3600 + $diff->i * 60 + $diff->s;
 }
 
-function read_items_from_database(PDO $conn, $from = null)
-{
-	$read = $conn->prepare('SELECT id, description, duration, date, advance_span, deadline_day, deadline_time, done FROM tasks WHERE date >= :today AND date < :date ORDER BY date ASC, done ASC, deadline_day IS NULL, deadline_day');
+function read_items_from_database(PDO $conn, $from = null) {
+	$read = $conn->prepare('SELECT id, description, duration, date, advance_span, deadline_day, deadline_time, done FROM tasks LEFT JOIN tasks_tags ON tasks.id = tasks_tags.task_id AND tasks_tags.tag_name = "deleted" WHERE tag_name IS NULL AND date >= :today AND date < :date ORDER BY date ASC, done ASC, deadline_day IS NULL, deadline_day');
 	$read->bindValue(':today', date_create($from)->format('Y-m-d'));
 	$read->bindValue(':date', date_add(date_create($from), new DateInterval('P8D'))->format('Y-m-d'));
 	$read->execute();
 	for ($i = 0; $i < 8; $i++) {
-		$days[date_add(date_create($from), new DateInterval('P' . $i . 'D'))->format('Y-m-d')] = [];
+		$items_by_days[date_add(date_create($from), new DateInterval('P' . $i . 'D'))->format('Y-m-d')] = [];
 	}
 	while ($row = $read->fetch(PDO::FETCH_OBJ)) {
-		$days[$row->date][] = $row;
+		$items_by_days[$row->date][] = $row;
 	}
-	return $days;
+	return $items_by_days;
 }
 
-function get_next_day_with_free_space(PDO $conn, $space_needed, $regarding_deadline_only = false)
-{
+function get_next_day_with_free_space(PDO $conn, $space_needed, $regarding_deadline_only = false) {
 	// TODO: Get additional time per task (20 min = 1200 seconds) from config
 	// Get future days including today with their used time from the database
 	// Why include today? There might still be time left
@@ -112,7 +107,7 @@ function get_next_day_with_free_space(PDO $conn, $space_needed, $regarding_deadl
 function make_space(PDO $conn, $day, $space_needed) {
 	// check if space_needed is larger than maximum time usage per day
 	// TODO load that from config
-	if($space_needed > (9 * 3600)) {
+	if ($space_needed > (9 * 3600)) {
 		return false;
 	}
 
@@ -123,7 +118,7 @@ function make_space(PDO $conn, $day, $space_needed) {
 	$result_all = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	$freetime = 9 * 3600 - $result_all[0]["usedtime"];
 	// return if it is enough
-	if($freetime >= $space_needed) {
+	if ($freetime >= $space_needed) {
 		return true;
 	}
 	// check how much space can be freed - tasks with deadline are not allowed to be moved
@@ -133,7 +128,7 @@ function make_space(PDO $conn, $day, $space_needed) {
 	$result_deadline = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	$uncriticaltime = 9 * 3600 - $result_deadline[0]["usedtime"];
 	// return if it is not enough
-	if($uncriticaltime < $space_needed) {
+	if ($uncriticaltime < $space_needed) {
 		return false;
 	}
 	// iterate over non-deadline tasks and move them until enough time is free
@@ -141,9 +136,9 @@ function make_space(PDO $conn, $day, $space_needed) {
 	$stmt = $conn->prepare('SELECT id, duration FROM tasks WHERE date = :date AND deadline_day IS NULL');
 	$stmt->bindValue(':date', $day);
 	$stmt->execute();
-	while($freetime < $space_needed && $task = $stmt->fetch(PDO::FETCH_ASSOC)) {
+	while ($freetime < $space_needed && $task = $stmt->fetch(PDO::FETCH_ASSOC)) {
 		$move_one = move_task($conn, $task["id"], get_next_day_with_free_space($conn, $task["duration"]));
-		if(!$move_one) {
+		if (!$move_one) {
 			return false; // damnit
 		}
 		$freetime += $task["duration"];
@@ -154,21 +149,20 @@ function make_space(PDO $conn, $day, $space_needed) {
 
 function create_task(PDO $conn, array $data) {
 	$valid_fields = ["description", "duration", "date", "advance_span", "deadline_day", "deadline_time", "recurrance_type", "recurrance_days", "done"];
-	$cleaned_data = array_filter($data, function ($key) use($valid_fields) {
+	$cleaned_data = array_filter($data, function ($key) use ($valid_fields) {
 		return in_array($key, $valid_fields);
 	}, ARRAY_FILTER_USE_KEY);
 
-	$stmt = "INSERT INTO tasks (" . implode(", ", array_keys($cleaned_data)) . ") VALUES (:" . implode(", :", array_keys($cleaned_data)) .")";
+	$stmt = "INSERT INTO tasks (" . implode(", ", array_keys($cleaned_data)) . ") VALUES (:" . implode(", :", array_keys($cleaned_data)) . ")";
 	$query = $conn->prepare($stmt);
-	foreach($cleaned_data as $field_key => $field_data) {
+	foreach ($cleaned_data as $field_key => $field_data) {
 		$query->bindValue(":" . $field_key, $field_data);
 	}
 	return $query->execute();
 }
 
-function move_task(PDO $conn, $id, $date)
-{
-	if($date == false) {
+function move_task(PDO $conn, $id, $date) {
+	if ($date == false) {
 		// propably called from make_space()
 		return false;
 	}
@@ -184,8 +178,7 @@ function move_task(PDO $conn, $id, $date)
 	return $conn->commit();
 }
 
-function done_task(PDO $conn, $task_ids)
-{
+function done_task(PDO $conn, $task_ids) {
 	if (!is_array($task_ids)) $task_ids = [$task_ids];
 	$done = $conn->prepare('UPDATE tasks SET done=((done | 1) - (done & 1)) WHERE id = :id');
 	$conn->beginTransaction();
@@ -196,8 +189,23 @@ function done_task(PDO $conn, $task_ids)
 	return $conn->commit();
 }
 
-function tag_task(PDO $conn, $id, $tag)
-{
+function delete_task(PDO $conn, $task_ids) {
+	// Simply actually delete all tasks that have not been imported from Google
+	$del_query = $conn->prepare('DELETE FROM tasks WHERE id = :id AND google_id IS NULL');
+	$conn->beginTransaction();
+	foreach ($task_ids as $task_id) {
+		$del_query->bindValue(':id', $task_id);
+		$del_query->execute();
+	}
+	$del_result = $conn->commit();
+
+	// Tag tasks to be deleted that have been imported from Google as "removed" to hide them but avoid re-import
+	$tag_query = $conn->prepare('INSERT OR IGNORE INTO tasks_tags (task_id, tag_name) SELECT id as task_id, \'deleted\' as tag_name FROM tasks WHERE id IN(:id_list)');
+	$tag_query->bindValue(':id_list', implode(',', $task_ids));
+	return $tag_query->execute() && $del_result;
+}
+
+function tag_task(PDO $conn, $id, $tag) {
 	$ioi = $conn->prepare('INSERT OR IGNORE INTO tasks_tags (task_id, tag_name) VALUES (:id, :tag)');
 	$ioi->bindValue(':id', $id);
 	$ioi->bindValue(':tag', $tag);

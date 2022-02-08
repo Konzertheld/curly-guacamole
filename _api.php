@@ -17,13 +17,7 @@ foreach (explode(",", $_GET["commands"]) as $command) {
 			echo move_task($conn, $task_ids, date("Y-m-d"));
 			break;
 		case "delete":
-			$done = $conn->prepare('DELETE FROM tasks WHERE id = :id');
-			$conn->beginTransaction();
-			foreach ($task_ids as $task_id) {
-				$done->bindValue(':id', $task_id);
-				$done->execute();
-			}
-			echo $conn->commit();
+			echo delete_task($conn, $task_ids);
 			break;
 		case "duration":
 			$done = $conn->prepare('UPDATE tasks SET duration=:duration WHERE id = :id');
