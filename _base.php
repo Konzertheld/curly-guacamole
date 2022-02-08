@@ -75,9 +75,9 @@ function get_next_day_with_free_space(PDO $conn, $space_needed, $regarding_deadl
 	// Why include today? There might still be time left
 	// TODO merge statements using ?:
 	if ($regarding_deadline_only) {
-		$stmt = $conn->prepare('SELECT date, SUM(duration) + COUNT(id) * 1200 usedtime FROM tasks WHERE date >= :date AND deadline_day IS NOT NULL GROUP BY date');
+		$stmt = $conn->prepare('SELECT date, SUM(duration) + COUNT(id) * 1200 usedtime FROM tasks LEFT JOIN tasks_tags ON tasks.id = tasks_tags.task_id AND tasks_tags.tag_name = \'deleted\' WHERE tag_name IS NULL AND date >= :date AND deadline_day IS NOT NULL GROUP BY date');
 	} else {
-		$stmt = $conn->prepare('SELECT date, SUM(duration) + COUNT(id) * 1200 usedtime FROM tasks WHERE date >= :date GROUP BY date');
+		$stmt = $conn->prepare('SELECT date, SUM(duration) + COUNT(id) * 1200 usedtime FROM tasks LEFT JOIN tasks_tags ON tasks.id = tasks_tags.task_id AND tasks_tags.tag_name = \'deleted\' WHERE tag_name IS NULL AND date >= :date GROUP BY date');
 	}
 	$stmt->bindValue(':date', date('Y-m-d'));
 	$stmt->execute();
@@ -112,7 +112,7 @@ function make_space(PDO $conn, $day, $space_needed): bool {
 	}
 
 	// check how much space is already free
-	$stmt = $conn->prepare('SELECT SUM(duration) + COUNT(id) * 1200 usedtime FROM tasks WHERE date = :date GROUP BY date');
+	$stmt = $conn->prepare('SELECT SUM(duration) + COUNT(id) * 1200 usedtime FROM tasks LEFT JOIN tasks_tags ON tasks.id = tasks_tags.task_id AND tasks_tags.tag_name = \'deleted\' WHERE tag_name IS NULL AND date = :date GROUP BY date');
 	$stmt->bindValue(':date', $day);
 	$stmt->execute();
 	$result_all = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -122,7 +122,7 @@ function make_space(PDO $conn, $day, $space_needed): bool {
 		return true;
 	}
 	// check how much space can be freed - tasks with deadline are not allowed to be moved
-	$stmt = $conn->prepare('SELECT SUM(duration) + COUNT(id) * 1200 usedtime FROM tasks WHERE date = :date AND deadline_day IS NOT NULL GROUP BY date');
+	$stmt = $conn->prepare('SELECT SUM(duration) + COUNT(id) * 1200 usedtime FROM tasks LEFT JOIN tasks_tags ON tasks.id = tasks_tags.task_id AND tasks_tags.tag_name = \'deleted\' WHERE tag_name IS NULL AND date = :date AND deadline_day IS NOT NULL GROUP BY date');
 	$stmt->bindValue(':date', $day);
 	$stmt->execute();
 	$result_deadline = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -133,7 +133,7 @@ function make_space(PDO $conn, $day, $space_needed): bool {
 	}
 	// iterate over non-deadline tasks and move them until enough time is free
 	// TODO order by... whatever
-	$stmt = $conn->prepare('SELECT id, duration FROM tasks WHERE date = :date AND deadline_day IS NULL');
+	$stmt = $conn->prepare('SELECT id, duration FROM tasks LEFT JOIN tasks_tags ON tasks.id = tasks_tags.task_id AND tasks_tags.tag_name = \'deleted\' WHERE tag_name IS NULL AND date = :date AND deadline_day IS NULL');
 	$stmt->bindValue(':date', $day);
 	$stmt->execute();
 	while ($freetime < $space_needed && $task = $stmt->fetch(PDO::FETCH_ASSOC)) {
