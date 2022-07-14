@@ -1,6 +1,13 @@
 <?php
 $google_token = null;
 
+// Load config
+$config = json_decode(file_get_contents('data/config.json'));
+
+// Open database
+$conn = new PDO('sqlite:' . __DIR__ . '/data/data.db');
+$conn->exec( 'PRAGMA foreign_keys = 1;' ); // only for non-transaction
+
 function post($url, $params) {
 	// use key 'http' even if you send the request to https://...
 	$options = array(
@@ -200,9 +207,13 @@ function delete_task(PDO $conn, $task_ids): bool {
 	$del_result = $conn->commit();
 
 	// Tag tasks to be deleted that have been imported from Google as "removed" to hide them but avoid re-import
-	$tag_query = $conn->prepare('INSERT OR IGNORE INTO tasks_tags (task_id, tag_name) SELECT id as task_id, \'deleted\' as tag_name FROM tasks WHERE id IN(:id_list)');
-	$tag_query->bindValue(':id_list', implode(',', $task_ids));
-	return $tag_query->execute() && $del_result;
+	$tag_query = $conn->prepare('INSERT OR IGNORE INTO tasks_tags (task_id, tag_name) SELECT id as task_id, \'deleted\' as tag_name FROM tasks WHERE id = :id');
+	$conn->beginTransaction();
+	foreach ($task_ids as $task_id) {
+		$tag_query->bindValue(':id', $task_id);
+		$tag_query->execute();
+	}
+	return $conn->commit() && $del_result;
 }
 
 function tag_task(PDO $conn, $id, $tag): bool {

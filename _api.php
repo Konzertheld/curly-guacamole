@@ -2,8 +2,6 @@
 require_once("_base.php");
 
 // this is so unsafe lol, don't use this on a non-local host
-// TODO: redundant, opening database also happens in index.php
-$conn = new PDO('sqlite:' . __DIR__ . '/data/data.db');
 if(isset($_GET["task_ids"])) {
 	$task_ids = explode(",", $_GET["task_ids"]);
 }
@@ -17,7 +15,7 @@ foreach (explode(",", $_GET["commands"]) as $command) {
 			echo move_task($conn, $task_ids, date("Y-m-d"));
 			break;
 		case "delete":
-			echo delete_task($conn, $task_ids);
+			echo "del result " . delete_task($conn, $task_ids);
 			break;
 		case "duration":
 			$done = $conn->prepare('UPDATE tasks SET duration=:duration WHERE id = :id');
