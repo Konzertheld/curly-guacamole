@@ -61,6 +61,20 @@ foreach (explode(",", $_GET["commands"]) as $command) {
 				$data["duration"] = 90 * 60; // TODO load default duration from config
 			}
 
+			// find recurrance. currently assuming type 2 always
+			$regex = "/(?:^| )(\*[0-9]+)(?:$| )/";
+			if(preg_match_all($regex, $task_string, $matches) > 0) {
+				if(count($matches[1]) > 1) {
+					// TODO error handling for more than one match
+				}
+				else {
+					$data["recurrence_days"] = substr($matches[1][0], 1);
+					$data["recurrence_type"] = 2;
+					// recurrence successfully found, remove it from string
+					$task_string = str_replace($matches[1][0], "", $task_string);
+				}
+			}
+
 			// find date
 			// find YYYY-MM-DD and MM-DD, with or wihout +-NNN suffix
 			$regex = "/(?:^| )([0-9]{4}-)?([0-9]{2}-[0-9]{2})([-+][0-9]+)?(?:$| )/";
