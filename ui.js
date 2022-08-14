@@ -132,10 +132,10 @@ function processTask(e) {
     };
     // check for day shortcuts
     skip_shift_date = false;
-    const regex = /(?<= )[QWERTZUIOYqwertzuioy]$/g;
-    const shortcut_result = data.task_string.match(regex);
+    const regex = /(?<= )([QWERTZUIOYqwertzuioy])([+-][0-9]+)?$/g;
+    const shortcut_result = regex.exec(data.task_string);
     if(shortcut_result !== null) {
-        switch(shortcut_result[0].toUpperCase()) {
+        switch(shortcut_result[1].toUpperCase()) {
             case "T":
                 date = $("#today").attr("data-date");
                 break;
@@ -168,12 +168,14 @@ function processTask(e) {
                 break;
         }
         // replace the letter with the date
-        data.task_string = data.task_string.substring(0, data.task_string.length - 1) + date;
+        data.task_string = data.task_string.substring(0, data.task_string.length - shortcut_result[0].length) + date;
+        if(shortcut_result[2] !== undefined) {
+            data.task_string += shortcut_result[2];
+        }
         skip_shift_date = true;
     }
     // process shift key
-    // this appends "today". Because only the first appearance of a data is processed, a manually added date will prevail
-    // TODO: but then "today" will show up in the description, not cool!
+    // this appends "today". Because only the first appearance of a date is processed, a manually added date will prevail
     if(e.shiftKey) {
         data.done = true;
         if(!skip_shift_date) {
