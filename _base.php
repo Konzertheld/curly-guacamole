@@ -155,7 +155,7 @@ function make_space(PDO $conn, $day, $space_needed): bool {
 }
 
 function create_task(PDO $conn, array $data): bool {
-	$valid_fields = ["description", "duration", "date", "advance_span", "deadline_day", "deadline_time", "recurrance_type", "recurrance_days", "done"];
+	$valid_fields = ["description", "duration", "date", "advance_span", "deadline_day", "deadline_time", "recurrence_type", "recurrence_days", "done"];
 	$cleaned_data = array_filter($data, function ($key) use ($valid_fields) {
 		return in_array($key, $valid_fields);
 	}, ARRAY_FILTER_USE_KEY);
