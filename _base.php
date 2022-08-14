@@ -187,13 +187,24 @@ function move_task(PDO $conn, $id, $date): bool {
 
 function done_task(PDO $conn, $task_ids): bool {
 	if (!is_array($task_ids)) $task_ids = [$task_ids];
+
+	// Toggle done
 	$done = $conn->prepare('UPDATE tasks SET done=((done | 1) - (done & 1)) WHERE id = :id');
 	$conn->beginTransaction();
 	foreach ($task_ids as $task_id) {
 		$done->bindValue(':id', $task_id);
 		$done->execute();
 	}
-	return $conn->commit();
+	$doneresult = $conn->commit();
+
+	// Create new instances of recurring tasks type 2 as per #16
+	$recurr = $conn->prepare('INSERT INTO tasks (description, duration, date, advance_span, deadline_day, deadline_time, recurrence_type, recurrence_days) SELECT description, duration, DATE(DATE(), "+" || recurrence_days || " days") as date, advance_span, deadline_day, deadline_time, recurrence_type, recurrence_days FROM tasks WHERE id=:id AND recurrence_type=2 AND done=1');
+	$conn->beginTransaction();
+	foreach ($task_ids as $task_id) {
+		$recurr->bindValue(':id', $task_id);
+		$recurr->execute();
+	}
+	return $doneresult && $conn->commit();
 }
 
 function delete_task(PDO $conn, $task_ids): bool {
