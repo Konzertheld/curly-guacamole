@@ -18,6 +18,7 @@ function google_auth_url()
 
 function google_exchange()
 {
+	return;
 	$auth_json = json_decode(file_get_contents('data/client_secret.json'));
 	$url = 'https://oauth2.googleapis.com/token';
 	$params['client_id'] = $auth_json->web->client_id;
@@ -36,6 +37,7 @@ function google_exchange()
 
 function google_check_and_refresh()
 {
+	return;
 	if (file_exists('data/google_token.json')) {
 		$credentials = json_decode(file_get_contents('data/client_secret.json'));
 		$token = json_decode(file_get_contents('data/google_token.json'));

@@ -10,12 +10,12 @@ if(isset($_GET['code'])) {
 }
 
 // Check if Google token needs to be refreshed
-google_check_and_refresh();
+//google_check_and_refresh();
 
 // Update database from Google
 $force_reload = isset($_GET['nocache']) && $_GET['nocache'] == 1;
-$google_items = google_get_next_events($config, $force_reload);
-google_write_items_to_database($conn, $google_items);
+//$google_items = google_get_next_events($config, $force_reload);
+//google_write_items_to_database($conn, $google_items);
 
 // Handle past tasks #8
 // Get'em
