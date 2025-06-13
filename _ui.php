@@ -36,7 +36,7 @@ function day_label($date, $suppress_prefix = false, $suppress_weekday = false): 
 		. $day->format("y");
 }
 
-function day_weekday($date = null) {
+function day_weekday($date = null): string {
 	return match(date_create($date)->format("w")) {
 		"1" => "Montag",
 		"2" => "Dienstag",
@@ -49,7 +49,7 @@ function day_weekday($date = null) {
 	};
 }
 
-function day_label_deadline($deadline_day, $day) {
+function day_label_deadline($deadline_day, $day): string {
 	// TODO wenn deadline_day == day == heute return "Heute"
 	// wenn day == heute und deadline_day > heute return "in X Tagen"
 	if($deadline_day == $day) {
@@ -62,7 +62,7 @@ function day_label_deadline($deadline_day, $day) {
 // subtract 2 to get position relative to selected day
 $day_shortcut_assignments = [1 => "Q", 2 => "W", 3 => "E", 4 => "R", 5 => "Z", 6 => "U", 7 => "I", 8 => "O"];
 
-function day_sum($days, $day) {
+function day_sum($days, $day): int {
 	$sum = 0;
 	foreach($days[$day] as $task) {
 		$sum += $task->duration + 1200;
@@ -70,7 +70,7 @@ function day_sum($days, $day) {
 	return $sum;
 }
 
-function duration_background_string($duration, $untilnow, $show_full_scale = false) {
+function duration_background_string($duration, $untilnow, $show_full_scale = false): string {
 	// TODO: Load total from config, that is the max time we expect to get done on a day (see also _base.php)
 	$total = 9 * 3600;
 	// include 20 min break into calculation when in per-task mode
