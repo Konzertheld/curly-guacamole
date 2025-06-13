@@ -11,13 +11,13 @@
 </head>
 <body>
 <header>
-	<a href="/planer"><h1 id="today" data-yesterday="<?php echo $yesterday; ?>" data-date="<?php echo $today; ?>">Heute ist <?php echo day_weekday(); ?>, der <?php echo day_label(date("Y-m-d"), true, true); ?></h1></a>
+	<a href="/planer/index.php"><h1 id="today" data-yesterday="<?php echo $yesterday; ?>" data-date="<?php echo $today; ?>">Heute ist <?php echo day_weekday(); ?>, der <?php echo day_label(date("Y-m-d"), true, true); ?></h1></a>
 	<section id="navigation">
-		<a href="/planer?from=<?php echo $jump_view_back; ?>"><<</a>
-		<a href="/planer?from=<?php echo $jump_day_back; ?>"><</a>
-		<a href="/planer?from=<?php echo $today; ?>">Heute</a>
-		<a href="/planer?from=<?php echo $jump_day_forward; ?>">></a>
-		<a href="/planer?from=<?php echo $jump_view_forward; ?>">>></a>
+		<a href="/planer/index.php?from=<?php echo $jump_view_back; ?>"><<</a>
+		<a href="/planer/index.php?from=<?php echo $jump_day_back; ?>"><</a>
+		<a href="/planer/index.php?from=<?php echo $today; ?>">Heute</a>
+		<a href="/planer/index.php?from=<?php echo $jump_day_forward; ?>">></a>
+		<a href="/planer/index.php?from=<?php echo $jump_view_forward; ?>">>></a>
 	</section>
 </header>
 
