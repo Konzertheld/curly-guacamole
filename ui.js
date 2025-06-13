@@ -11,7 +11,7 @@ window.onload = function () {
     });
 
     // Keyboard shortcuts
-    $("body").on("keypress", null, null, function (e) {
+    $("body").on("keyup", null, null, function (e) {
         var tag = e.target.tagName.toLowerCase();
         if(tag === "input" || tag === "textarea" || ($("#new-event-input")[0].value.trim() !== "")) {
             // react to enter here
@@ -43,7 +43,7 @@ window.onload = function () {
                 // d for done
                 commands = ["done"];
                 break;
-            case 127:
+            case 46:
                 // del
                 commands = ["delete"];
                 break;
