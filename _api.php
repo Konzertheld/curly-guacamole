@@ -11,9 +11,6 @@ foreach (explode(",", $_GET["commands"]) as $command) {
 		case "done":
 			echo done_task($conn, $task_ids);
 			break;
-		case "today":
-			echo move_task($conn, $task_ids, date("Y-m-d"));
-			break;
 		case "delete":
 			echo "del result " . delete_task($conn, $task_ids);
 			break;

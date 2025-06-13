@@ -34,12 +34,7 @@ window.onload = function () {
 
         switch (e.which) {
             // Note that the order might be important
-            case 84:
             case 68:
-                // D for done and move to today, also for uppercase T
-                commands = ["today", "done"];
-                break;
-            case 100:
                 // d for done
                 commands = ["done"];
                 break;
@@ -52,55 +47,48 @@ window.onload = function () {
                 // 1 for set duration to 1x 15min
             case 50:
                 // 2 for set duration to 2x 15min = 30min etc
-            case 51:
-            case 52:
+            case 51: // 3
+            case 52: // 4
             case 53:
             case 54:
             case 55:
-            case 56: // 2 hours
+            case 56: // 8 - 2 hours
                 commands = ["duration"];
                 additional = (e.which - 48) * 15 * 60;
                 break;
             // Move
             // tricky code: use switch fallthrough but avoid overriding variable
-            // for uppercase letters, add "done"
             // Q W E R for the first row
-            case 81:
-            case 113:
+            case 81: // q
                 day_id = 1;
-            case 87:
-            case 119:
+            case 87: // w
                 if(typeof day_id === "undefined") day_id = 2;
-            case 69:
-            case 101:
+            case 69: // e
                 if(typeof day_id === "undefined") day_id = 3;
-            case 82:
-            case 114:
+            case 82: // r
                 if(typeof day_id === "undefined") day_id = 4;
             // Z U I O for the second row
-            case 90:
-            case 122:
+            case 90: // z
                 if(typeof day_id === "undefined") day_id = 5;
-            case 85:
-            case 117:
+            case 85: // u
                 if(typeof day_id === "undefined") day_id = 6;
-            case 73:
-            case 105:
+            case 73: // i
                 if(typeof day_id === "undefined") day_id = 7;
-            case 79:
-            case 111:
+            case 79: // o
                 if(typeof day_id === "undefined") day_id = 8;
-                additional = $("#day-" + day_id).attr("data-date");
+            // t for Today
+            case 84:
+                // no day_id needed for today
+                // provide date if target is not today
+                if(typeof day_id !== "undefined") {
+                    additional = $("#day-" + day_id).attr("data-date");
+                }
                 if(e.shiftKey) {
                     commands = ["done", "move"]
                 }
                 else {
                     commands = ["move"];
                 }
-                break;
-            // Today
-            case 116:
-                commands = ["today"];
                 break;
             case 32:
                 // space for abort all
